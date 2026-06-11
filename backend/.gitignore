@@ -1,0 +1,20 @@
+# Database Configuration (Now connected to remote MySQL Tradeware database)
+DATABASE_URL="mysql+pymysql://root:Tr@d3w@63@100.86.181.18:3309/Tradeware"
+
+# MySQL ERP Configuration
+MYSQL_HOST="100.86.181.18"
+MYSQL_PORT="3309"
+MYSQL_DATABASE="Sales_Masters"
+MYSQL_USERNAME="root"
+MYSQL_PASSWORD="Tr@d3w@63"
+
+# JWT Authentication
+SECRET_KEY="super-secret-key-for-edip-suite"
+
+# Qdrant Vector Database
+QDRANT_HOST="localhost"
+QDRANT_PORT="6333"
+
+# AI Model Configuration
+GEMINI_API_KEY=YOUR_API_KEY_HERE
+GEMINI_MODEL="gemini-2.0-flash"

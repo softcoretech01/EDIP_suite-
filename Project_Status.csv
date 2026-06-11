@@ -1,0 +1,17 @@
+Requirement,Task,Status
+"Project Initialization","Setup Backend FastAPI structure and Frontend React framework",Completed
+"Database Architecture","Design and create SQLite/MySQL tables for Tenants, Connections, and Chat History using SQLAlchemy models",Completed
+"ERP Connections","Build endpoints to add, manage, and test database connections dynamically (erp_connections.py)",Completed
+"Vector Database Integration","Configure Qdrant for storing and retrieving table schemas using vector embeddings (qdrant_service.py)",Completed
+"LLM Integration","Implement Gemini AI service to convert natural language to SQL queries based on database context (gemini_service.py)",Completed
+"Security","Implement SQL Validator to sanitize generated queries and enforce SELECT-only operations",Completed
+"AI Chat Interface","Build conversational AI Chat UI in React to send questions and receive summarized data",Completed
+"Dynamic Visualization","Develop DynamicDashboard component to render data tables, pie charts, and bar charts based on AI suggestions",Completed
+"Database Synchronization","Build sync tools (sync_tradeware.py / force-sync) to extract schemas from live MySQL DBs and embed them into Qdrant",Completed
+"User Experience Split","Refactor UI to support a 'Normal Chat' view and a dedicated 'Dashboard Search' view",Completed
+"Authentication System","Implement JWT-based Login and Registration pages for secure access",Pending
+"Dashboard History","Save generated dashboard configurations so users can access them later without regenerating",Pending
+"Advanced Visualizations","Add support for more complex charts (Line, Scatter, Area) and customizable colors",Pending
+"Role Based Access (RBAC)","Restrict which tables or dashboards certain users are allowed to query",Pending
+"Data Exporting","Allow users to export generated dashboard data to CSV, Excel, or PDF",Pending
+"Production Deployment","Create Dockerfiles for frontend, backend, and Qdrant to deploy the application to a cloud server",Pending

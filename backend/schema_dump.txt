@@ -1,0 +1,288 @@
+CREATE TABLE `Invoice_Details` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `invoice_id` varchar(50) NOT NULL,
+  `item_id` varchar(50) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `ordered_qty` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `supplied_qty` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `pending_qty` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `unit_price` decimal(15,2) NOT NULL DEFAULT 0.00,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `Invoice_Header` (
+  `invoice_id` varchar(50) NOT NULL,
+  `so_id` varchar(50) NOT NULL,
+  `cpo_ref` varchar(50) DEFAULT NULL,
+  `customer_name` varchar(150) NOT NULL,
+  `amount` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `tax_amount` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `tax_type` varchar(10) NOT NULL DEFAULT 'IGST',
+  `total` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`invoice_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `SalesOrder_Details` (
+  `so_details_id` int(11) NOT NULL AUTO_INCREMENT,
+  `So_number` varchar(50) NOT NULL,
+  `item_id` varchar(50) NOT NULL,
+  `name` varchar(150) NOT NULL,
+  `ordered_qty` decimal(10,2) NOT NULL DEFAULT 1.00,
+  `supplied_qty` decimal(10,2) NOT NULL DEFAULT 1.00,
+  `pending_qty` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `unit_price` decimal(15,2) NOT NULL DEFAULT 0.00,
+  PRIMARY KEY (`so_details_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `SalesOrder_Header` (
+  `id` varchar(50) NOT NULL,
+  `So_number` varchar(50) DEFAULT NULL,
+  `customer_name` varchar(150) NOT NULL,
+  `date` date NOT NULL,
+  `delivery_schedule` date NOT NULL,
+  `invoice_generated` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `grn_Details` (
+  `grn_item_id` int(11) NOT NULL AUTO_INCREMENT,
+  `grn_id` int(11) NOT NULL,
+  `item_id` varchar(50) NOT NULL,
+  `po_qty` decimal(15,4) NOT NULL,
+  `received_qty` decimal(15,4) NOT NULL,
+  `batch_lot_number` varchar(100) DEFAULT NULL,
+  `mfg_date` date DEFAULT NULL,
+  `expiry_date` date DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`grn_item_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `grn_Header` (
+  `grn_id` int(11) NOT NULL AUTO_INCREMENT,
+  `grn_number` varchar(50) NOT NULL,
+  `po_id` int(11) DEFAULT NULL,
+  `supplier_id` varchar(50) NOT NULL,
+  `grn_date` date NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`grn_id`),
+  UNIQUE KEY `grn_number` (`grn_number`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `import_landed_costs_Details` (
+  `detail_id` int(11) NOT NULL AUTO_INCREMENT,
+  `import_landed_cost_id` int(11) NOT NULL,
+  `item_id` varchar(50) NOT NULL,
+  `qty` decimal(15,4) NOT NULL,
+  `fob_val_lcy` decimal(15,2) DEFAULT 0.00,
+  `allocated_overhead` decimal(15,2) DEFAULT 0.00,
+  `total_landed_cost` decimal(15,2) DEFAULT 0.00,
+  `landed_unit_cost` decimal(15,2) DEFAULT 0.00,
+  PRIMARY KEY (`detail_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `import_landed_costs_Header` (
+  `import_landed_cost_id` int(11) NOT NULL AUTO_INCREMENT,
+  `import_po_id` int(11) NOT NULL,
+  `duty_percent` decimal(5,2) DEFAULT 0.00,
+  `cess_percent` decimal(5,2) DEFAULT 0.00,
+  `gst_percent` decimal(5,2) DEFAULT 0.00,
+  `include_gst` tinyint(1) DEFAULT 0,
+  `sea_freight` decimal(15,2) DEFAULT 0.00,
+  `road_freight` decimal(15,2) DEFAULT 0.00,
+  `local_transport` decimal(15,2) DEFAULT 0.00,
+  `liner_charges` decimal(15,2) DEFAULT 0.00,
+  `insurance_cost` decimal(15,2) DEFAULT 0.00,
+  `handling_charges` decimal(15,2) DEFAULT 0.00,
+  `packing_charges` decimal(15,2) DEFAULT 0.00,
+  `aging_charges` decimal(15,2) DEFAULT 0.00,
+  `total_customs_duty` decimal(15,2) DEFAULT 0.00,
+  `total_freight` decimal(15,2) DEFAULT 0.00,
+  `total_port_charges` decimal(15,2) DEFAULT 0.00,
+  `total_overhead` decimal(15,2) DEFAULT 0.00,
+  `total_landed_cost` decimal(15,2) DEFAULT 0.00,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `is_posted` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`import_landed_cost_id`),
+  UNIQUE KEY `import_po_id` (`import_po_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `import_purchase_orders_Details` (
+  `detail_id` int(11) NOT NULL AUTO_INCREMENT,
+  `import_po_id` int(11) NOT NULL,
+  `item_id` varchar(50) NOT NULL,
+  `currency_id` int(11) DEFAULT NULL,
+  `qty` decimal(15,4) NOT NULL,
+  `fcy_unit_price` decimal(15,4) NOT NULL,
+  `total_fcy` decimal(15,2) DEFAULT 0.00,
+  PRIMARY KEY (`detail_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `import_purchase_orders_Header` (
+  `import_po_id` int(11) NOT NULL AUTO_INCREMENT,
+  `import_po_number` varchar(50) NOT NULL,
+  `supplier_id` varchar(50) NOT NULL,
+  `po_date` date NOT NULL,
+  `currency_id` int(11) DEFAULT NULL,
+  `exchange_rate` decimal(10,4) NOT NULL,
+  `payment_terms` varchar(100) DEFAULT NULL,
+  `total_fcy` decimal(15,2) DEFAULT 0.00,
+  `total_lcy` decimal(15,2) DEFAULT 0.00,
+  `status` varchar(50) DEFAULT 'Ordered',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`import_po_id`),
+  UNIQUE KEY `import_po_number` (`import_po_number`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `inventory_batches` (
+  `batch_id` int(11) NOT NULL AUTO_INCREMENT,
+  `batch_no` varchar(50) NOT NULL,
+  `item_id` varchar(50) NOT NULL,
+  `current_qty` decimal(15,2) NOT NULL,
+  `mfg_date` date DEFAULT NULL,
+  `expiry_date` date DEFAULT NULL,
+  `landed_unit_cost` decimal(15,4) NOT NULL,
+  `final_selling_price` decimal(15,4) NOT NULL,
+  `margin_percent` decimal(5,2) DEFAULT 20.00,
+  `status` varchar(50) DEFAULT 'Available',
+  `source_type` enum('Local Purchase','Import Purchase') NOT NULL,
+  `po_reference` varchar(50) DEFAULT NULL,
+  `grn_reference` varchar(50) DEFAULT NULL,
+  `IPO_reference` varchar(50) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `is_posted` int(11) DEFAULT 0,
+  `inward_qty` decimal(15,2) DEFAULT 0.00,
+  `outward_qty` decimal(15,2) DEFAULT 0.00,
+  `damaged_qty` decimal(15,2) DEFAULT 0.00,
+  `damage_remarks` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`batch_id`),
+  UNIQUE KEY `batch_no` (`batch_no`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `local_landed_cost_Details` (
+  `landed_cost_item_id` int(11) NOT NULL AUTO_INCREMENT,
+  `landed_cost_id` int(11) NOT NULL,
+  `item_id` varchar(50) NOT NULL,
+  `qty` decimal(15,4) NOT NULL,
+  `unit_price` decimal(15,4) NOT NULL,
+  `val_lcy` decimal(15,2) NOT NULL,
+  `allocated_overhead` decimal(15,2) NOT NULL,
+  `total_landed_cost` decimal(15,2) NOT NULL,
+  `landed_unit_cost` decimal(15,4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`landed_cost_item_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `local_landed_cost_Header` (
+  `landed_cost_id` int(11) NOT NULL AUTO_INCREMENT,
+  `grn_id` int(11) NOT NULL,
+  `insurance_charges` decimal(15,2) DEFAULT 0.00,
+  `handling_charges` decimal(15,2) DEFAULT 0.00,
+  `packing_charges` decimal(15,2) DEFAULT 0.00,
+  `aging_charges` decimal(15,2) DEFAULT 0.00,
+  `total_lcy` decimal(15,2) NOT NULL,
+  `total_overhead` decimal(15,2) NOT NULL,
+  `total_landed_cost` decimal(15,2) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `is_posted` tinyint(1) DEFAULT 0,
+  PRIMARY KEY (`landed_cost_id`),
+  UNIQUE KEY `grn_id` (`grn_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `purchase_order_Details` (
+  `po_item_id` int(11) NOT NULL AUTO_INCREMENT,
+  `po_id` int(11) NOT NULL,
+  `item_id` varchar(50) NOT NULL,
+  `quantity` decimal(15,4) NOT NULL,
+  `uom` varchar(20) DEFAULT NULL,
+  `unit_price` decimal(15,2) NOT NULL,
+  `tax_rate` decimal(5,2) DEFAULT 0.00,
+  `line_total` decimal(15,2) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`po_item_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `purchase_order_delivery_schedules` (
+  `schedule_id` int(11) NOT NULL AUTO_INCREMENT,
+  `po_id` int(11) NOT NULL,
+  `expected_delivery_date` date NOT NULL,
+  `target_quantity` decimal(15,4) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`schedule_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `purchase_orders_Header` (
+  `po_id` int(11) NOT NULL AUTO_INCREMENT,
+  `po_number` varchar(50) NOT NULL,
+  `pr_id` int(11) DEFAULT NULL,
+  `supplier_id` varchar(50) NOT NULL,
+  `po_date` date NOT NULL,
+  `payment_terms` varchar(100) DEFAULT NULL,
+  `sub_total` decimal(15,2) DEFAULT 0.00,
+  `tax_total` decimal(15,2) DEFAULT 0.00,
+  `grand_total` decimal(15,2) DEFAULT 0.00,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`po_id`),
+  UNIQUE KEY `po_number` (`po_number`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `purchase_requisition_Details` (
+  `pr_id` int(11) NOT NULL,
+  `item_id` varchar(50) DEFAULT NULL,
+  `requested_quantity` decimal(15,4) NOT NULL,
+  `uom` varchar(20) DEFAULT NULL,
+  `reason_for_request` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `unit_price` decimal(15,2) DEFAULT NULL,
+  `total_price` decimal(15,2) DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `purchase_requisitions_Header` (
+  `pr_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `pr_number` varchar(50) NOT NULL,
+  `pr_date` date NOT NULL,
+  `required_by_date` date DEFAULT NULL,
+  `department` varchar(100) DEFAULT NULL,
+  `requested_by` int(11) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp(),
+  `priority` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`pr_id`),
+  UNIQUE KEY `pr_number` (`pr_number`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `purchase_return_Details` (
+  `return_item_id` int(11) NOT NULL AUTO_INCREMENT,
+  `return_id` int(11) NOT NULL,
+  `item_id` varchar(50) NOT NULL,
+  `inwarded_qty` decimal(15,4) NOT NULL,
+  `return_qty` decimal(15,4) NOT NULL,
+  `return_reason` varchar(255) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`return_item_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
+CREATE TABLE `purchase_return_Header` (
+  `return_id` int(11) NOT NULL AUTO_INCREMENT,
+  `return_number` varchar(50) NOT NULL,
+  `grn_id` int(11) NOT NULL,
+  `supplier_id` varchar(50) NOT NULL,
+  `return_date` date NOT NULL,
+  `debit_note_status` varchar(50) DEFAULT 'Pending',
+  `refund_total` decimal(15,2) DEFAULT 0.00,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`return_id`),
+  UNIQUE KEY `return_number` (`return_number`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci
+
