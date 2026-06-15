@@ -1,5 +1,9 @@
+# AI Provider Configuration (ollama or gemini)
+AI_PROVIDER="ollama"
+OLLAMA_MODEL="qwen2.5-coder:3b"  # 🔄 CHANGED HERE
+
 # Database Configuration (Now connected to remote MySQL Tradeware database)
-DATABASE_URL="mysql+pymysql://root:Tr@d3w@63@100.86.181.18:3309/Tradeware"
+DATABASE_URL="mysql+pymysql://root:Tr%40d3w%4063@100.86.181.18:3309/Tradeware"
 
 # MySQL ERP Configuration
 MYSQL_HOST="100.86.181.18"
@@ -16,5 +20,4 @@ QDRANT_HOST="localhost"
 QDRANT_PORT="6333"
 
 # AI Model Configuration
-GEMINI_API_KEY=YOUR_API_KEY_HERE
-GEMINI_MODEL="gemini-2.0-flash"
+OLLAMA_MODEL="qwen2.5-coder:3

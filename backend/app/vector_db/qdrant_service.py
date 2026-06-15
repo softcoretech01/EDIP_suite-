@@ -13,18 +13,24 @@ QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
 QDRANT_PORT = os.getenv("QDRANT_PORT", "6333")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "")
 
+_qdrant_client = None
+
 def get_qdrant_client() -> QdrantClient:
     """
     Initializes and returns a QdrantClient based on environment variables.
     Supports both local and cloud Qdrant connections.
     """
+    global _qdrant_client
+    if _qdrant_client is not None:
+        return _qdrant_client
     try:
         if QDRANT_HOST == "localhost" or QDRANT_HOST == "127.0.0.1":
             # Using memory/local server for development if API key is not set
             if not QDRANT_API_KEY:
                 # Use persistent local file storage (as before) to ensure backward compatibility
                 db_path = os.path.join(os.path.dirname(__file__), "local_qdrant")
-                return QdrantClient(path=db_path)
+                _qdrant_client = QdrantClient(path=db_path)
+                return _qdrant_client
             
         # Cloud or external server connection
         client = QdrantClient(
@@ -32,7 +38,8 @@ def get_qdrant_client() -> QdrantClient:
             api_key=QDRANT_API_KEY if QDRANT_API_KEY else None,
             timeout=10
         )
-        return client
+        _qdrant_client = client
+        return _qdrant_client
     except Exception as e:
         logger.error(f"Failed to initialize Qdrant client: {e}")
         raise

@@ -25,6 +25,14 @@ def _warmup_ollama():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Create database tables at startup if they do not exist (wrapped in try-except for robustness)
+    try:
+        from app.database.database import Base, engine
+        Base.metadata.create_all(bind=engine)
+        print("[startup] Database tables verified/created.")
+    except Exception as e:
+        print(f"[startup] WARNING: Database connection failed. Tables could not be created/verified: {e}")
+
     # Warm up Ollama in a background thread so it doesn't block the server from starting
     loop = asyncio.get_event_loop()
     loop.run_in_executor(None, _warmup_ollama)
@@ -51,11 +59,13 @@ app.add_middleware(
 def read_root():
     return {"message": "Welcome to EDIP Suite API"}
 
-from app.api import erp_connections, chat, health, auth_api
+from app.api import erp_connections, chat, health, auth_api, uploads
 
 app.include_router(auth_api.router)
 app.include_router(erp_connections.router)
 app.include_router(chat.router)
 app.include_router(health.router)
+app.include_router(uploads.router)
+
 
 # Trigger reload 3

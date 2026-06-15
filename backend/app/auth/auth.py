@@ -13,9 +13,9 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
-# OAuth2 scheme looks for authorization token under /auth/login or similar, 
+# OAuth2 scheme looks for authorization token under /auth/swagger-login or similar, 
 # but we can accept it in any endpoint using this bearer token dependency.
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/swagger-login", auto_error=False)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:

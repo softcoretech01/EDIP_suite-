@@ -10,11 +10,17 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import EditIcon from '@mui/icons-material/Edit';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import DescriptionIcon from '@mui/icons-material/Description';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { Select, MenuItem, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Button } from '@mui/material';
 import { LoginRegister } from './components/Auth/LoginRegister';
 
 const DRAWER_WIDTH = 260;
-const API_URL = 'http://localhost:8000';
+const API_URL = 'http://127.0.0.1:8000';
 
 interface ChatMessage {
   id: string;
@@ -54,6 +60,8 @@ function App() {
   const [dashboardSearch, setDashboardSearch] = useState('');
   const [dashboardData, setDashboardData] = useState<any | null>(null);
   const [chatInput, setChatInput] = useState('');
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+  const [isUploadingFile, setIsUploadingFile] = useState<boolean>(false);
 
   const handleEditMessage = (index: number, text: string) => {
     setMessages(prev => prev.slice(0, index));
@@ -68,6 +76,45 @@ function App() {
     scrollToBottom();
   }, [messages]);
 
+  const fetchUploadedFiles = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/uploads/`);
+      setUploadedFiles(res.data);
+    } catch (e) {
+      console.error("Failed to load uploaded files", e);
+    }
+  };
+
+  const handleUploadFile = async (file: File) => {
+    setIsUploadingFile(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await axios.post(`${API_URL}/uploads/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      fetchUploadedFiles();
+    } catch (error: any) {
+      console.error(error);
+      const errorText = error.response?.data?.detail || "Upload failed.";
+      alert(`Upload Failed: ${errorText}`);
+    } finally {
+      setIsUploadingFile(false);
+    }
+  };
+
+  const handleDeleteFile = async (fileId: number) => {
+    if (!window.confirm("Are you sure you want to delete this file and remove all its search index data?")) return;
+    try {
+      await axios.delete(`${API_URL}/uploads/${fileId}`);
+      fetchUploadedFiles();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
@@ -76,6 +123,7 @@ function App() {
     setToken(null);
     setMessages([]);
     setRecents([]);
+    setUploadedFiles([]);
   };
 
   const handleLoginSuccess = (accessToken: string, refreshToken: string, userData: any) => {
@@ -189,6 +237,7 @@ function App() {
       }).catch(console.error);
 
       fetchHistory();
+      fetchUploadedFiles();
     }
   }, [user]);
 
@@ -455,6 +504,60 @@ function App() {
                   </List>
                 </>
               )}
+
+              {/* Document Manager */}
+              <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.05)', mt: 3, pt: 2 }}>
+                <Typography variant="subtitle2" sx={{ color: '#F9FAFB', mb: 1.5, px: 2, fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <CloudUploadIcon sx={{ fontSize: 16, color: '#00F0FF' }} /> Uploaded Files
+                </Typography>
+                
+                {uploadedFiles.length === 0 ? (
+                  <Typography variant="caption" sx={{ color: 'text.secondary', px: 2, display: 'block', fontStyle: 'italic' }}>
+                    No documents uploaded yet.
+                  </Typography>
+                ) : (
+                  <List dense sx={{ maxHeight: 200, overflowY: 'auto', pr: 0.5 }}>
+                    {uploadedFiles.map((f) => (
+                      <ListItem
+                        key={f.id}
+                        secondaryAction={
+                          <IconButton edge="end" aria-label="delete" size="small" onClick={() => handleDeleteFile(f.id)} sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: 'error.main' } }}>
+                            <DeleteIcon sx={{ fontSize: 16 }} />
+                          </IconButton>
+                        }
+                        disablePadding
+                        sx={{
+                          mb: 0.5,
+                          borderRadius: 1.5,
+                          '&:hover': { bgcolor: 'rgba(255,255,255,0.03)' }
+                        }}
+                      >
+                        <ListItemButton disabled sx={{ py: 0.5, px: 1.5 }}>
+                          <ListItemIcon sx={{ minWidth: 28 }}>
+                            {f.file_type === 'excel' && <TableChartIcon sx={{ fontSize: 16, color: '#10B981' }} />}
+                            {f.file_type === 'pdf' && <PictureAsPdfIcon sx={{ fontSize: 16, color: '#EF4444' }} />}
+                            {f.file_type === 'word' && <DescriptionIcon sx={{ fontSize: 16, color: '#3B82F6' }} />}
+                            {f.file_type === 'text' && <InsertDriveFileIcon sx={{ fontSize: 16, color: '#F59E0B' }} />}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <Typography sx={{
+                                color: '#D1D5DB',
+                                fontSize: '0.75rem',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                              }}>
+                                {f.filename}
+                              </Typography>
+                            }
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
+              </Box>
             </Box>
 
             {/* User details and Logout button */}
@@ -512,7 +615,9 @@ function App() {
                     isLoading={isDashboardLoading} 
                     value={dashboardSearch} 
                     onChange={setDashboardSearch} 
-                    clearOnSubmit={false} 
+                    clearOnSubmit={false}
+                    onUpload={handleUploadFile}
+                    isUploading={isUploadingFile}
                   />
                 </Box>
                 {isDashboardLoading && (
@@ -552,7 +657,14 @@ function App() {
                     Ask me questions about your ERP data.
                   </Typography>
                   <Box sx={{ width: '100%' }}>
-                    <AIChat onAsk={handleAsk} isLoading={isLoading} value={chatInput} onChange={setChatInput} />
+                    <AIChat 
+                      onAsk={handleAsk} 
+                      isLoading={isLoading} 
+                      value={chatInput} 
+                      onChange={setChatInput} 
+                      onUpload={handleUploadFile}
+                      isUploading={isUploadingFile}
+                    />
                   </Box>
                 </Container>
               ) : (
@@ -630,7 +742,14 @@ function App() {
                   justifyContent: 'center'
                 }}>
                   <Container maxWidth="md">
-                    <AIChat onAsk={handleAsk} isLoading={isLoading} value={chatInput} onChange={setChatInput} />
+                    <AIChat 
+                      onAsk={handleAsk} 
+                      isLoading={isLoading} 
+                      value={chatInput} 
+                      onChange={setChatInput} 
+                      onUpload={handleUploadFile}
+                      isUploading={isUploadingFile}
+                    />
                   </Container>
                 </Box>
               )}

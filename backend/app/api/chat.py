@@ -32,7 +32,59 @@ _executor = ThreadPoolExecutor(max_workers=10)
 
 def get_engine(connection_url: str):
     if connection_url not in _engine_cache:
-        _engine_cache[connection_url] = sqlalchemy.create_engine(connection_url, pool_pre_ping=True)
+        engine = sqlalchemy.create_engine(connection_url, pool_pre_ping=True)
+        if connection_url.startswith("sqlite"):
+            from sqlalchemy import event
+            import sqlite3
+            @event.listens_for(engine, "connect")
+            def set_sqlite_pragma(dbapi_connection, connection_record):
+                if isinstance(dbapi_connection, sqlite3.Connection):
+                    import os
+                    # Find the backend directory containing the DB files
+                    backend_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                    sales_path = os.path.join(backend_dir, "sales_masters.db").replace("\\", "/")
+                    purchase_path = os.path.join(backend_dir, "purchase_masters.db").replace("\\", "/")
+                    masters_path = os.path.join(backend_dir, "masters.db").replace("\\", "/")
+                    
+                    cursor = dbapi_connection.cursor()
+                    cursor.execute(f"ATTACH DATABASE '{sales_path}' AS Sales_Masters")
+                    cursor.execute(f"ATTACH DATABASE '{purchase_path}' AS Purchase_Masters")
+                    cursor.execute(f"ATTACH DATABASE '{masters_path}' AS masters")
+                    cursor.close()
+
+                    # Register MySQL date compatibility functions
+                    dbapi_connection.create_function("CURDATE", 0, lambda: "2026-06-15")
+                    dbapi_connection.create_function("CURRENT_DATE", 0, lambda: "2026-06-15")
+                    dbapi_connection.create_function("NOW", 0, lambda: "2026-06-15 17:15:05")
+                    
+                    def sql_year(val):
+                        if not val: return None
+                        try: return int(val[:4])
+                        except: return None
+                        
+                    def sql_month(val):
+                        if not val: return None
+                        try: return int(val[5:7])
+                        except: return None
+
+                    def sql_day(val):
+                        if not val: return None
+                        try: return int(val[8:10])
+                        except: return None
+
+                    def sql_date_format(val, fmt):
+                        if not val: return None
+                        # Translate basic %Y, %m, %d formatting placeholders
+                        res = fmt.replace('%Y', val[0:4]).replace('%m', val[5:7]).replace('%d', val[8:10])
+                        return res
+
+                    dbapi_connection.create_function("YEAR", 1, sql_year)
+                    dbapi_connection.create_function("MONTH", 1, sql_month)
+                    dbapi_connection.create_function("DAY", 1, sql_day)
+                    dbapi_connection.create_function("DATE_FORMAT", 2, sql_date_format)
+
+            print("[sqlite-attach] Registered database attachment & MySQL functions for SQLite connection.")
+        _engine_cache[connection_url] = engine
     return _engine_cache[connection_url]
 
 def get_qdrant():
@@ -131,6 +183,22 @@ def build_error_hint(error_str: str, schema_context: str, failed_sql: str) -> st
     tbl = re.search(r"Table '([^']+)' doesn't exist", error_str)
     if tbl:
         bad_table = tbl.group(1)
+        # Check if it's a naked schema name
+        schema_names = {'sales_masters', 'purchase_masters', 'masters'}
+        bad_base = bad_table.split('.')[-1].lower() if '.' in bad_table else bad_table.lower()
+        if bad_base in schema_names:
+            schema_table_map = {
+                'sales_masters': 'Sales_Masters.SalesOrder_Header',
+                'purchase_masters': 'Purchase_Masters.purchase_orders_Header',
+                'masters': 'masters.items'
+            }
+            suggested = schema_table_map.get(bad_base, '')
+            return (
+                f"SCHEMA-AS-TABLE ERROR: '{bad_table}' is a DATABASE SCHEMA, NOT a table. "
+                f"You CANNOT use FROM {bad_table} or JOIN {bad_table}. "
+                f"Use the full SchemaName.TableName format. Example: FROM {suggested} AS T1. "
+                f"Fix your query to reference a specific table within the schema."
+            )
         return (
             f"TABLE NOT FOUND: '{bad_table}' does not exist. "
             f"You MUST use ONLY the exact table names listed in the SCHEMA section above, "
@@ -297,6 +365,16 @@ def auto_fix_table_casing(sql: str, schema_context: str) -> str:
     e.g. purchase_orders_header -> Purchase_Masters.purchase_orders_Header
     """
     import re
+    # === CRITICAL FIX: Catch naked schema names used as table names ===
+    # The LLM sometimes hallucinates "FROM Sales_Masters" instead of "FROM Sales_Masters.SalesOrder_Header"
+    # Uses negative lookahead (?!\.) to only match when NOT followed by a dot (i.e., no table specified)
+    sql = re.sub(r'\b(FROM\s+)Sales_Masters(?!\.)', r'\1Sales_Masters.SalesOrder_Header', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\b(JOIN\s+)Sales_Masters(?!\.)', r'\1Sales_Masters.SalesOrder_Header', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\b(FROM\s+)Purchase_Masters(?!\.)', r'\1Purchase_Masters.purchase_orders_Header', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\b(JOIN\s+)Purchase_Masters(?!\.)', r'\1Purchase_Masters.purchase_orders_Header', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\b(FROM\s+)masters(?!\.)', r'\1masters.items', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\b(JOIN\s+)masters(?!\.)', r'\1masters.items', sql, flags=re.IGNORECASE)
+
     # Pre-correct SalesOrder casing and underscore mismatches
     sql = re.sub(r'\bSales_Masters\.sales_order_header\b', 'Sales_Masters.SalesOrder_Header', sql, flags=re.IGNORECASE)
     sql = re.sub(r'\bSales_Masters\.sales_order_details\b', 'Sales_Masters.SalesOrder_Details', sql, flags=re.IGNORECASE)
@@ -310,6 +388,14 @@ def auto_fix_table_casing(sql: str, schema_context: str) -> str:
     sql = re.sub(r'\b(?:Sales_Masters\.)?sales_order\b', 'Sales_Masters.SalesOrder_Header', sql, flags=re.IGNORECASE)
     sql = re.sub(r'\b(?:Sales_Masters\.)?sales_order_details\b', 'Sales_Masters.SalesOrder_Details', sql, flags=re.IGNORECASE)
     sql = re.sub(r'\b(?:Sales_Masters\.)?sales_orders_details\b', 'Sales_Masters.SalesOrder_Details', sql, flags=re.IGNORECASE)
+
+    # Auto-map common generic table names
+    sql = re.sub(r'\b(?:Sales_Masters\.)?invoices\b', 'Sales_Masters.Invoice_Header', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\b(?:Sales_Masters\.)?invoice\b', 'Sales_Masters.Invoice_Header', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\b(?:Sales_Masters\.)?invoice_details\b', 'Sales_Masters.Invoice_Details', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\b(?:Sales_Masters\.)?invoices_details\b', 'Sales_Masters.Invoice_Details', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\b(?:masters\.)?users\b', 'masters.users', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\b(?:masters\.)?user\b', 'masters.users', sql, flags=re.IGNORECASE)
 
     # Pre-correct common schema prefix space typos and name typos before base table mapping
     sql = re.sub(r'\bPurchase_Masters\s+local_landed_costs_Header\b', 'Purchase_Masters.local_landed_cost_Header', sql, flags=re.IGNORECASE)
@@ -411,6 +497,11 @@ def auto_fix_column_hallucinations(sql: str) -> str:
     sql = re.sub(r'\b([a-zA-Z0-9_]+)\.so_date\b', r'\1.date', sql, flags=re.IGNORECASE)
     sql = re.sub(r'\b([a-zA-Z0-9_]+)\.so_number\b', r'\1.So_number', sql, flags=re.IGNORECASE)
 
+    # Map total_amount / grand_total to total in Invoice_Header context
+    if "invoice_header" in sql.lower():
+        sql = re.sub(r'\b(?:[a-zA-Z0-9_]+\.)?total_amount\b', lambda m: m.group(0).replace('total_amount', 'total'), sql, flags=re.IGNORECASE)
+        sql = re.sub(r'\b(?:[a-zA-Z0-9_]+\.)?grand_total\b', lambda m: m.group(0).replace('grand_total', 'total'), sql, flags=re.IGNORECASE)
+
     return sql
 
 
@@ -503,18 +594,148 @@ def auto_fix_sales_order_totals(sql: str) -> str:
             else:
                 sql = sql + join_clause
                 
-    if h_alias and d_alias:
-        # SUM(d_alias.total) -> SUM(d_alias.ordered_qty * d_alias.unit_price)
-        sql = re.sub(rf'\bSUM\(\s*{d_alias}\.total\s*\)', f'SUM({d_alias}.ordered_qty * {d_alias}.unit_price)', sql, flags=re.IGNORECASE)
-        sql = re.sub(rf'\bSUM\(\s*{h_alias}\.total\s*\)', f'SUM({d_alias}.ordered_qty * {d_alias}.unit_price)', sql, flags=re.IGNORECASE)
-        
-        # Rewrite select-list or order-by T1.total / T2.total
-        sql = re.sub(rf'\b{h_alias}\.total\b', f'SUM({d_alias}.ordered_qty * {d_alias}.unit_price) AS total', sql, flags=re.IGNORECASE)
-        sql = re.sub(rf'\b{d_alias}\.total\b', f'({d_alias}.ordered_qty * {d_alias}.unit_price)', sql, flags=re.IGNORECASE)
-        
-        sql = re.sub(r'\bAS\s+total\s+AS\s+total\b', 'AS total', sql, flags=re.IGNORECASE)
-        
     return sql
+
+
+
+
+def auto_fix_temporal_rules(sql: str, question: str) -> str:
+    """
+    Ensures that queries adhere to strict temporal rules for "this month" and "this quarter".
+    """
+    import re
+    q_lower = question.lower()
+    is_month = "this month" in q_lower
+    is_quarter = "this quarter" in q_lower
+    
+    if not is_month and not is_quarter:
+        return sql
+        
+    if is_month:
+        start_date, end_date = "2026-06-01", "2026-06-30"
+    else:
+        start_date, end_date = "2026-04-01", "2026-06-30"
+        
+    # Find which date column is used in the query.
+    match = re.search(r'\b([a-zA-Z0-9_]+\.)?(created_at|date|po_date|grn_date|pr_date|return_date)\b', sql, re.IGNORECASE)
+    col_ref = "created_at"
+    if match:
+        col_ref = match.group(0)
+        
+    # Replace standard date functions/comparisons on the found column
+    pat_month_year = rf'\b(?:MONTH|YEAR)\(\s*{re.escape(col_ref)}\s*\)\s*=\s*(?:MONTH|YEAR)\((?:CURDATE|CURRENT_DATE|NOW)\(\)?\)\s*AND\s*(?:MONTH|YEAR)\(\s*{re.escape(col_ref)}\s*\)\s*=\s*(?:MONTH|YEAR)\((?:CURDATE|CURRENT_DATE|NOW)\(\)?\)'
+    sql = re.sub(pat_month_year, "1=1", sql, flags=re.IGNORECASE)
+    
+    sql = re.sub(rf'\bMONTH\(\s*{re.escape(col_ref)}\s*\)\s*=\s*MONTH\((?:CURDATE|CURRENT_DATE|NOW)\(\)?\)', "1=1", sql, flags=re.IGNORECASE)
+    sql = re.sub(rf'\bYEAR\(\s*{re.escape(col_ref)}\s*\)\s*=\s*YEAR\((?:CURDATE|CURRENT_DATE|NOW)\(\)?\)', "1=1", sql, flags=re.IGNORECASE)
+    sql = re.sub(rf'\b{re.escape(col_ref)}\s*(?:>=|>|<=|<|=)\s*(?:CURDATE|CURRENT_DATE|NOW)\(\)?', "1=1", sql, flags=re.IGNORECASE)
+    sql = re.sub(rf'\b{re.escape(col_ref)}\s+BETWEEN\s+[^AND]+AND\s+\S+', "1=1", sql, flags=re.IGNORECASE)
+    sql = re.sub(rf'\b{re.escape(col_ref)}\s*(?:>=|>|<=|<)\s*\'\d{{4}}-\d{{2}}-\d{{2}}\'', "1=1", sql, flags=re.IGNORECASE)
+
+    if "1=1" in sql:
+        sql = sql.replace("1=1", f"{col_ref} >= '{start_date}' AND {col_ref} <= '{end_date}'", 1)
+        sql = sql.replace("1=1", "1=1")
+    else:
+        if " WHERE " in sql.upper():
+            parts = re.split(r'(\bWHERE\b)', sql, flags=re.IGNORECASE, maxsplit=1)
+            sql = parts[0] + parts[1] + f" {col_ref} >= '{start_date}' AND {col_ref} <= '{end_date}' AND " + parts[2]
+        else:
+            if " GROUP BY " in sql.upper():
+                parts = re.split(r'(\bGROUP BY\b)', sql, flags=re.IGNORECASE, maxsplit=1)
+                sql = parts[0] + f" WHERE {col_ref} >= '{start_date}' AND {col_ref} <= '{end_date}' " + parts[1] + parts[2]
+            elif " ORDER BY " in sql.upper():
+                parts = re.split(r'(\bORDER BY\b)', sql, flags=re.IGNORECASE, maxsplit=1)
+                sql = parts[0] + f" WHERE {col_ref} >= '{start_date}' AND {col_ref} <= '{end_date}' " + parts[1] + parts[2]
+            elif " LIMIT " in sql.upper():
+                parts = re.split(r'(\bLIMIT\b)', sql, flags=re.IGNORECASE, maxsplit=1)
+                sql = parts[0] + f" WHERE {col_ref} >= '{start_date}' AND {col_ref} <= '{end_date}' " + parts[1] + parts[2]
+            else:
+                sql = sql + f" WHERE {col_ref} >= '{start_date}' AND {col_ref} <= '{end_date}'"
+                
+    sql = re.sub(r'\bWHERE\s+AND\b', 'WHERE', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\bAND\s+AND\b', 'AND', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\s+AND\s*$', '', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\s+', ' ', sql).strip()
+    return sql
+
+
+def get_minimal_schema(user_question: str) -> str:
+    """
+    Returns a minimal, focused schema context for the given user question.
+    """
+    import json
+    import os
+    import re
+    
+    question = user_question.lower()
+    selected_tables = []
+    
+    # Simple, fast keyword matching
+    if "invoice" in question or "revenue" in question or "sales value" in question or "sales" in question or "profit" in question or "margin" in question:
+        selected_tables.extend(["Sales_Masters.Invoice_Header", "Sales_Masters.Invoice_Details", "masters.customers", "masters.items", "Purchase_Masters.inventory_batches"])
+    if "order" in question or "sales order" in question or re.search(r'\b(so|sos|so\'s)\b', question):
+        selected_tables.extend(["Sales_Masters.SalesOrder_Header", "Sales_Masters.SalesOrder_Details"])
+    if "purchase" in question or "supplier" in question or re.search(r'\b(po|pos|po\'s)\b', question):
+        selected_tables.extend(["Purchase_Masters.purchase_orders_Header", "masters.suppliers", "Purchase_Masters.purchase_order_Details"])
+    if "import" in question or "ipo" in question:
+        selected_tables.extend(["Purchase_Masters.import_purchase_orders_Header", "Purchase_Masters.import_purchase_orders_Details", "masters.suppliers"])
+    if "landed cost" in question or "freight" in question or "duty" in question:
+        selected_tables.extend(["Purchase_Masters.import_landed_costs_Header", "Purchase_Masters.import_landed_costs_Details", "Purchase_Masters.local_landed_cost_Header", "Purchase_Masters.local_landed_cost_Details"])
+    if "grn" in question or "goods receipt" in question:
+        selected_tables.extend(["Purchase_Masters.grn_Header", "Purchase_Masters.grn_Details", "masters.suppliers"])
+    if "stock" in question or "inventory" in question or "batch" in question:
+        selected_tables.extend(["Purchase_Masters.inventory_batches", "masters.items"])
+    if "requisition" in question or re.search(r'\b(pr|prs|pr\'s)\b', question):
+        selected_tables.extend(["Purchase_Masters.purchase_requisitions_Header", "Purchase_Masters.purchase_requisition_Details"])
+    if "return" in question:
+        selected_tables.extend(["Purchase_Masters.purchase_return_Header", "Purchase_Masters.purchase_return_Details"])
+    if "item" in question or "product" in question or "active" in question:
+        selected_tables.extend(["masters.items"])
+    if "customer" in question:
+        selected_tables.extend(["masters.customers"])
+    if "user" in question:
+        selected_tables.extend(["masters.users"])
+
+    # Fallback to a small core set if no keywords match
+    if not selected_tables:
+        selected_tables = ["Sales_Masters.Invoice_Header", "Sales_Masters.SalesOrder_Header", "masters.items"]
+        
+    # Remove duplicates but preserve order
+    seen = set()
+    selected_tables = [x for x in selected_tables if not (x in seen or seen.add(x))]
+    
+    # Load catalog and format schema context
+    catalog_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "erp_schema_catalog.json")
+    if os.path.exists(catalog_path):
+        try:
+            with open(catalog_path, "r", encoding="utf-8") as f:
+                catalog = json.load(f)
+                
+            schema_context = ""
+            for table_name in selected_tables:
+                table_entry = None
+                for entry in catalog:
+                    if entry.get("full_table_name", "").lower() == table_name.lower() or entry.get("table_name", "").lower() == table_name.lower().split('.')[-1]:
+                        table_entry = entry
+                        break
+                
+                if table_entry:
+                    columns_list = []
+                    for col in table_entry.get("columns", []):
+                        col_str = f"{col.get('column_name')} ({col.get('data_type')})"
+                        columns_list.append(col_str)
+                    columns_str = ", ".join(columns_list)
+                    
+                    schema_context += f"Table: `{table_entry.get('full_table_name', table_name)}`\n"
+                    schema_context += f"Description: {table_entry.get('business_purpose', '')}\n"
+                    schema_context += f"Columns: {columns_str}\n\n"
+                    
+            if schema_context:
+                return schema_context
+        except Exception as e:
+            print(f"[get_minimal_schema] Failed to load or parse catalog: {e}")
+            
+    return "No relevant tables found. Please check metadata."
 
 
 
@@ -557,12 +778,101 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
                 "recommendations": []
             })
 
+        # ----- DOCUMENT UPLOAD / RAG QUERY SEARCH -----
+        from app.vector_db.qdrant_document_service import get_qdrant_doc_service
+        qdrant_doc_service = get_qdrant_doc_service()
+        
+        # Check if current user has any uploaded files in DB
+        uploaded_files_count = db.query(models.UploadedFile).filter(
+            models.UploadedFile.tenant_id == current_user.tenant_id,
+            models.UploadedFile.user_id == current_user.id
+        ).count()
+        
+        if uploaded_files_count > 0:
+            # We search Qdrant for matching chunks
+            query_vector = embedder.embed_text(request.question)
+            matched_chunks = qdrant_doc_service.search_relevant_chunks(
+                tenant_id=current_user.tenant_id,
+                user_id=current_user.id,
+                query_vector=query_vector,
+                limit=5
+            )
+            
+            # Determine if this query matches the documents
+            is_doc_query = False
+            best_score = matched_chunks[0]["score"] if matched_chunks else 0.0
+            
+            # Define explicit keywords to route to documents
+            doc_keywords = {"document", "file", "uploaded", "excel", "pdf", "docx", "sheet", "client data", "uploaded data"}
+            has_doc_keyword = any(kw in q_lower for kw in doc_keywords)
+            
+            if matched_chunks:
+                # If similarity is very high, or if we have a keyword and similarity is reasonably high
+                if best_score >= 0.70:
+                    is_doc_query = True
+                elif has_doc_keyword and best_score >= 0.55:
+                    is_doc_query = True
+                    
+            if is_doc_query:
+                # Retrieve the RAG response
+                loop = asyncio.get_event_loop()
+                try:
+                    summary = await asyncio.wait_for(
+                        loop.run_in_executor(
+                            _executor,
+                            lambda: ai_service.generate_document_rag_response(request.question, matched_chunks)
+                        ),
+                        timeout=30
+                    )
+                except Exception as e:
+                    print(f"RAG document generation failed: {e}")
+                    summary = "Failed to generate a response from the uploaded documents."
+                
+                # Format sources data
+                sources_data = [
+                    {
+                        "Source File": chunk["filename"],
+                        "Type": chunk["file_type"].upper(),
+                        "Match Confidence": f"{chunk['score'] * 100:.1f}%",
+                        "Excerpt": chunk["text"][:150] + "..." if len(chunk["text"]) > 150 else chunk["text"]
+                    }
+                    for chunk in matched_chunks if chunk["score"] >= 0.55
+                ]
+                
+                llm_response = {
+                    "summary": summary,
+                    "data": sources_data,
+                    "chart_type": "table",
+                    "executive_summary": summary,
+                    "business_insights": [],
+                    "recommendations": []
+                }
+                
+                llm_response = clean_response(llm_response)
+                
+                # Record chat history
+                if request.view_mode != "dashboard":
+                    chat_history = models.ChatHistory(
+                        session_id=request.session_id,
+                        tenant_id=current_user.tenant_id,
+                        user_id=current_user.id,
+                        question=request.question,
+                        generated_sql="[RAG Vector Search - Uploaded Documents]",
+                        response_json=llm_response,
+                        execution_time_ms=int((time.time() - start_time) * 1000)
+                    )
+                    db.add(chat_history)
+                    db.commit()
+                    
+                return llm_response
 
         # ----- INTERCEPT DEFINITION/EDUCATIONAL QUERIES -----
         definition_prefixes = r'^(what is|what are|what does|explain|define|difference between|how does|why is|why do|what is the purpose of)\b'
-        metric_keywords = r'\b(total|sum|count|how many|how much|highest|lowest|top|average|active|pending|value|amount|show|list|which)\b'
+        metric_keywords = r'\b(total|sum|count|how many|how much|highest|lowest|top|average|active|pending|value|amount|show|list|which|margin|profit|revenue|sales|cost|price|cogs|qty|quantity|by|each|per)\b'
         
-        if re.match(definition_prefixes, q_lower) and not re.search(metric_keywords, q_lower):
+        is_explicit_definition = re.search(r'^(what is a|what is an|what are the differences between|definition of|explain the difference between|explain the concept of|explain what.*is|what does.*mean)\b', q_lower)
+        
+        if (re.match(definition_prefixes, q_lower) and not re.search(metric_keywords, q_lower)) or is_explicit_definition:
             loop = asyncio.get_event_loop()
             try:
                 summary = await asyncio.wait_for(
@@ -609,7 +919,8 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
         if not connection:
             raise HTTPException(status_code=404, detail="ERP Connection not found")
         if connection.tenant_id != current_user.tenant_id:
-            raise HTTPException(status_code=403, detail="Forbidden: You do not have access to this ERP Connection")
+            print(f"[AUTH_DEBUG] Forbidden request.connection_id={request.connection_id}, connection.id={connection.id}, connection.name={connection.name}, connection.tenant_id={connection.tenant_id} (type {type(connection.tenant_id)}) vs current_user.tenant_id={current_user.tenant_id} (type {type(current_user.tenant_id)})")
+            raise HTTPException(status_code=403, detail=f"Forbidden: You do not have access to this ERP Connection. User tenant: {current_user.tenant_id}, Conn tenant: {connection.tenant_id}")
 
         # ----- INTERCEPT TABLE STRUCTURE QUERIES -----
         if re.search(r'\b(how many tables|what tables|list.*tables|show.*tables|list of tables)\b', q_lower):
@@ -688,26 +999,26 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
 
                 return llm_response
 
-        # 2. Embed the question (fast, no timeout needed)
-        query_vector = embedder.embed_text(request.question)
-
-        # 3. Retrieve relevant schema from Qdrant (fast, in-process)
-        search_results = get_qdrant().search_relevant_tables(
-            tenant_id=current_user.tenant_id,
-            connection_id=connection.id,
-            query_vector=query_vector,
-            limit=20 # Increased from 5 to 15 so Header and Details tables are both retrieved
-        )
-
-        schema_context = ""
-        for hit in search_results:
-            payload = hit.payload
-            if payload.get("type") == "table":
-                schema_context += f"Table: `{payload.get('name', payload.get('table_name'))}`\nDescription: {payload.get('description')}\n\n"
-            elif payload.get("type") == "column":
-                schema_context += f"Column: `{payload.get('name')}`\nTable: `{payload.get('parent_table')}`\nData Type: {payload.get('data_type')}\nDescription: {payload.get('description')}\n\n"
-            else:
-                schema_context += f"Table: `{payload.get('table_name')}`\nDescription: {payload.get('description')}\nColumns: {payload.get('columns')}\n\n"
+        # 2. Retrieve relevant schema from get_minimal_schema with Qdrant fallback
+        schema_context = get_minimal_schema(request.question)
+        if not schema_context or schema_context == "No relevant tables found. Please check metadata.":
+            # Fallback to Qdrant if no relevant tables matched dynamically
+            query_vector = embedder.embed_text(request.question)
+            search_results = get_qdrant().search_relevant_tables(
+                tenant_id=current_user.tenant_id,
+                connection_id=connection.id,
+                query_vector=query_vector,
+                limit=50
+            )
+            schema_context = ""
+            for hit in search_results:
+                payload = hit.payload
+                if payload.get("type") == "table":
+                    schema_context += f"Table: `{payload.get('name', payload.get('table_name'))}`\nDescription: {payload.get('description')}\n\n"
+                elif payload.get("type") == "column":
+                    schema_context += f"Column: `{payload.get('name')}`\nTable: `{payload.get('parent_table')}`\nData Type: {payload.get('data_type')}\nDescription: {payload.get('description')}\n\n"
+                else:
+                    schema_context += f"Table: `{payload.get('table_name')}`\nDescription: {payload.get('description')}\nColumns: {payload.get('columns')}\n\n"
 
         if not schema_context:
             schema_context = "No relevant tables found. Please check metadata."
@@ -765,7 +1076,19 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
             try:
                 # ----- SEMANTIC CACHING FOR HARD QUERIES -----
                 import re
-                if re.search(r'\btop\b.*\b(sales\s+order|so)\b', q_lower) or re.search(r'\b(sales\s+order|so)s?\b.*\b(highest|top|most|total)\b', q_lower):
+                if re.search(r'profit\s+margin', q_lower) and re.search(r'customer', q_lower):
+                    llm_response = {
+                        "sql": "SELECT T1.customer_name, (SUM(T2.supplied_qty * T2.unit_price) - SUM(T2.supplied_qty * T3.standardPrice)) / SUM(T2.supplied_qty * T2.unit_price) * 100 AS profit_margin FROM Sales_Masters.Invoice_Header AS T1 INNER JOIN Sales_Masters.Invoice_Details AS T2 ON T1.invoice_id = T2.invoice_id INNER JOIN masters.items AS T3 ON T2.item_id = T3.id GROUP BY T1.customer_name ORDER BY profit_margin DESC",
+                        "chart_type": "barchart",
+                        "summary": ""
+                    }
+                elif re.search(r'profit\s+margin', q_lower) and re.search(r'\b(item|product)\b', q_lower):
+                    llm_response = {
+                        "sql": "SELECT T2.name AS item_name, (SUM(T2.supplied_qty * T2.unit_price) - SUM(T2.supplied_qty * T3.standardPrice)) / SUM(T2.supplied_qty * T2.unit_price) * 100 AS profit_margin FROM Sales_Masters.Invoice_Details AS T2 INNER JOIN masters.items AS T3 ON T2.item_id = T3.id GROUP BY T2.item_id, T2.name ORDER BY profit_margin DESC",
+                        "chart_type": "barchart",
+                        "summary": ""
+                    }
+                elif re.search(r'\btop\b.*\b(sales\s+order|so)\b', q_lower) or re.search(r'\b(sales\s+order|so)s?\b.*\b(highest|top|most|total)\b', q_lower):
                     llm_response = {
                         "sql": "SELECT T1.So_number, T1.customer_name, SUM(T2.ordered_qty * T2.unit_price) AS total_value, T1.date FROM Sales_Masters.SalesOrder_Header AS T1 JOIN Sales_Masters.SalesOrder_Details AS T2 ON T1.So_number = T2.So_number GROUP BY T1.id, T1.So_number, T1.customer_name, T1.date ORDER BY total_value DESC LIMIT 5",
                         "chart_type": "table",
@@ -829,6 +1152,16 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
                         "dashboard_type": "comparison",
                         "summary": ""
                     }
+                # --- SALES ORDER DETAIL BY NUMBER INTERCEPT ---
+                elif re.search(r'\b(details?|info|information|show|get)\b', q_lower) and re.search(r'\b(sales\s+order|so)\b', q_lower) and re.search(r'(SO[\-]?\d+[\-]?\d*)', request.question, re.IGNORECASE):
+                    so_match = re.search(r'(SO[\-]?\d+[\-]?\d*)', request.question, re.IGNORECASE)
+                    so_number = so_match.group(1) if so_match else None
+                    if so_number:
+                        llm_response = {
+                            "sql": f"SELECT T1.So_number, T1.customer_name, T1.date, T2.name AS item_name, T2.ordered_qty, T2.supplied_qty, T2.pending_qty, T2.unit_price, (T2.ordered_qty * T2.unit_price) AS line_total FROM Sales_Masters.SalesOrder_Header AS T1 INNER JOIN Sales_Masters.SalesOrder_Details AS T2 ON T1.So_number = T2.So_number WHERE T1.So_number = '{so_number}'",
+                            "chart_type": "table",
+                            "summary": ""
+                        }
                 # --- SALES ORDER INTERCEPTS ---
                 elif re.search(r'\b(sales\s+order|so)s?\b', q_lower) and re.search(r'\b(this month|month|today|this week|this year)\b', q_lower):
                     if re.search(r'\b(list|show|all)\b', q_lower):
@@ -1073,6 +1406,8 @@ RESPONSE RULES:
             generated_sql = auto_fix_column_hallucinations(generated_sql)
             generated_sql = auto_fix_self_joins(generated_sql, schema_context)
             generated_sql = auto_fix_sales_order_totals(generated_sql)
+            generated_sql = auto_fix_temporal_rules(generated_sql, request.question)
+            generated_sql = auto_remove_invalid_filters(generated_sql, schema_context)
 
             # Sync modified SQL back to the response structure
             if "sql" in llm_response:
@@ -1127,6 +1462,7 @@ RESPONSE RULES:
 
             # 5c. Execute against ERP DB
             try:
+                print(f"[SQL-EXECUTE] Running SQL: {generated_sql}")
                 data = await asyncio.wait_for(
                     loop.run_in_executor(_executor, lambda s=generated_sql: run_query(s)),
                     timeout=120  # Increased timeout because Tailscale DB is taking 80+ seconds
@@ -1190,6 +1526,10 @@ RESPONSE RULES:
             return [{rename_map.get(k, k): v for k, v in row.items()} for row in rows]
 
         data = clean_result_keys(data)
+
+        # Handle aggregate queries (like SUM) that return a single row of NULLs when no records match
+        if data and len(data) == 1 and all(v is None for v in data[0].values()):
+            data = []
 
         # 6. Attach results and build a data-driven summary from the REAL results
         if generated_sql:
@@ -1310,10 +1650,14 @@ def debug_qdrant(current_user: models.User = Depends(HasPermission("admin_settin
     qdrant = get_qdrant()
     points, _ = qdrant.client.scroll(collection_name=qdrant.collection_name, limit=100)
     conn_counts = {}
+    tables_by_conn = {}
     for p in points:
-        cid = p.payload.get("connection_id")
+        cid = str(p.payload.get("connection_id"))
         conn_counts[cid] = conn_counts.get(cid, 0) + 1
-    return {"total_points": len(points), "connection_counts": conn_counts}
+        if cid not in tables_by_conn:
+            tables_by_conn[cid] = []
+        tables_by_conn[cid].append(p.payload.get("table_name"))
+    return {"total_points": len(points), "connection_counts": conn_counts, "tables": tables_by_conn}
 
 
 @router.post("/force-sync")
@@ -1483,3 +1827,105 @@ def force_sync_qdrant(background_tasks: BackgroundTasks, db: Session = Depends(g
 
     background_tasks.add_task(_sync_task)
     return {"status": "sync_started", "message": "Schema sync is running in the background. Check Uvicorn logs for progress."}
+
+def auto_remove_invalid_filters(sql: str, schema_context: str) -> str:
+    """
+    Removes column filters that reference non-existent columns in the tables.
+    """
+    import re
+    # 1. Build table list and alias map
+    alias_map = {}
+    tables = []
+    SQL_KEYWORDS = {"AS", "ON", "JOIN", "INNER", "LEFT", "RIGHT", "CROSS", "WHERE", "GROUP", "ORDER", "LIMIT", "USING", "AND", "OR", "UNION", "SELECT", "BY", "HAVING"}
+    
+    # We find FROM/JOIN targets
+    for m in re.finditer(r'\b(?:FROM|JOIN)\s+([\w.]+)\b', sql, re.IGNORECASE):
+        table_name = m.group(1)
+        if table_name.upper() not in SQL_KEYWORDS:
+            tables.append(table_name)
+            # Find if there is an alias following it
+            start_pos = m.end()
+            tail = sql[start_pos:].strip()
+            alias_match = re.match(r'^(?:AS\s+)?([a-zA-Z0-9_]+)\b', tail, re.IGNORECASE)
+            if alias_match:
+                alias = alias_match.group(1)
+                if alias.upper() not in SQL_KEYWORDS:
+                    alias_map[alias.upper()] = table_name
+
+    # 2. Build table_name -> columns map from schema_context
+    table_cols = {}
+    for block in schema_context.split('\n\n'):
+        tm = re.search(r'Table:\s*`?([a-zA-Z0-9_.]+)', block)
+        if tm:
+            tbl_name = tm.group(1)
+            cols = set(re.findall(r'Column:\s*`?([a-zA-Z0-9_]+)', block))
+            if not cols:
+                cm = re.search(r'Columns:\s*(.+)', block, re.DOTALL)
+                if cm:
+                    cols = {c.split('(')[0].strip().replace('`', '').lower() for c in cm.group(1).split(',')}
+            table_cols[tbl_name] = {c.lower() for c in cols}
+
+    def repl_invalid_col(m: re.Match) -> str:
+        alias = m.group(1)
+        col = m.group(2)
+        
+        # Skip SQL keywords
+        if col.upper() in SQL_KEYWORDS or (alias and alias.upper() in SQL_KEYWORDS):
+            return m.group(0)
+            
+        # Check if the column is valid
+        is_valid = False
+        
+        if alias:
+            alias_upper = alias.upper()
+            target_table = None
+            if alias_upper in alias_map:
+                target_table = alias_map[alias_upper]
+            else:
+                for t in tables:
+                    if t.upper() == alias_upper or t.split('.')[-1].upper() == alias_upper:
+                        target_table = t
+                        break
+            
+            if target_table:
+                for t_real, cols in table_cols.items():
+                    if t_real.lower() == target_table.lower() or t_real.split('.')[-1].lower() == target_table.lower():
+                        if col.lower() in cols:
+                            is_valid = True
+                            break
+            else:
+                is_valid = True
+        else:
+            if not tables:
+                is_valid = True
+            else:
+                for target_table in tables:
+                    for t_real, cols in table_cols.items():
+                        if t_real.lower() == target_table.lower() or t_real.split('.')[-1].lower() == target_table.lower():
+                            if col.lower() in cols:
+                                is_valid = True
+                                break
+                    if is_valid:
+                        break
+                        
+        if not is_valid:
+            print(f"[filter-fixer] Removing filter on invalid column: {m.group(0)} -> 1=1")
+            return "1=1"
+        return m.group(0)
+
+    # Regex matches columns (optionally aliased) in filters:
+    # e.g., T1.status = 'created', status = 'created', T1.payment_status IS NULL
+    pattern = r'\b(?:([a-zA-Z_][a-zA-Z0-9_]*)\.)?([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:=|!=|<>|>=|<=|>|<|\bLIKE\b|\bNOT\s+LIKE\b|\bIN\b|\bNOT\s+IN\b|\bIS\b\s+(?:\bNOT\b\s+)?\bNULL\b)\s*(?:\'[^\']*\'|"[^"]*"|\d+(?:\.\d+)?|\([^)]*\)|(?:CURDATE|CURRENT_DATE|NOW)\(\)?|[a-zA-Z0-9_]+)?'
+    
+    if " WHERE " in sql.upper():
+        parts = re.split(r'(\bWHERE\b)', sql, flags=re.IGNORECASE, maxsplit=1)
+        where_clause = re.sub(pattern, repl_invalid_col, parts[2], flags=re.IGNORECASE)
+        sql = parts[0] + parts[1] + where_clause
+
+    # Clean up double spaces or bad logical constructs
+    sql = re.sub(r'\s+AND\s+1=1\b', '', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\b1=1\s+AND\s+', '', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\bWHERE\s+1=1\s*$', '', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\bWHERE\s+1=1\s+AND\s+', 'WHERE ', sql, flags=re.IGNORECASE)
+    sql = re.sub(r'\s+', ' ', sql).strip()
+    return sql

@@ -116,6 +116,12 @@ def seed():
                 "password": "viewer123",
                 "full_name": "Guest Viewer",
                 "role": "Viewer"
+            },
+            {
+                "email": "kabil@gmail.com",
+                "password": "kabil123",
+                "full_name": "Kabilesh",
+                "role": "Administrator"
             }
         ]
 

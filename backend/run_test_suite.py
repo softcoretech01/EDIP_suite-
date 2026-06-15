@@ -51,7 +51,9 @@ erp_questions = [
 ]
 
 API_URL = "http://localhost:8001/chat/ask"
+AUTH_URL = "http://localhost:8001/auth/login"
 CONNECTION_ID = 2
+ACCESS_TOKEN = None
 
 def run_test_question(question, category):
     payload = {
@@ -63,14 +65,11 @@ def run_test_question(question, category):
     headers = {
         "Content-Type": "application/json"
     }
-    # Using default credentials/auth if needed (the app relies on current_user, let's see if auth is required or bypassed)
-    # Note: /chat/ask depends on get_current_user. In test_api.py, there are no auth headers, which means there might be
-    # middleware, or security might require a bearer token. Let's see if we get a 401 or 403 or if it is bypassed.
+    if ACCESS_TOKEN:
+        headers["Authorization"] = f"Bearer {ACCESS_TOKEN}"
     
     start_time = time.time()
     try:
-        # We also need an auth token if the API is protected. 
-        # Let's run a test call with requests. If we get a 401, we will need to obtain a token first.
         response = requests.post(API_URL, json=payload, headers=headers, timeout=30)
         elapsed = time.time() - start_time
         return {
@@ -88,21 +87,24 @@ def run_test_question(question, category):
         }
 
 def main():
+    global ACCESS_TOKEN
     print("==================================================")
     print("EDIP SUITE INTEGRATION TEST RUNNER")
     print("==================================================")
     
-    # Let's perform a sample test first to check auth requirements
-    print("\n[Test 1] Testing basic connectivity...")
-    test_result = run_test_question("What is ERP?", "General")
-    print(f"Status Code: {test_result['status_code']}")
-    
-    if test_result['status_code'] == 401 or test_result['status_code'] == 403:
-        print("API is protected by authentication. Attempting to login and get token...")
-        # Let's look up how auth/token is retrieved in the frontend or check tests
-        # We can try to authenticate. Let's check models/schemas to see how token endpoint is structured.
-        # Commonly it is POST /auth/login or /token. Let's run this script first to inspect.
-        pass
+    print("\nAuthenticating login...")
+    try:
+        r = requests.post(AUTH_URL, json={
+            "email": "admin@edip.com",
+            "password": "admin123"
+        })
+        if r.status_code == 200:
+            ACCESS_TOKEN = r.json().get("access_token")
+            print("Authenticated successfully!")
+        else:
+            print(f"Auth failed: {r.status_code} - {r.text}")
+    except Exception as e:
+        print(f"Auth request error: {e}")
 
     # We will test 5 general and 5 erp questions
     sample_general = general_questions[:5]

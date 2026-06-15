@@ -148,3 +148,15 @@ class LLMSettings(Base):
     model_name = Column(String(100))
     api_key_encrypted = Column(String(500))
     temperature = Column(String(50))
+
+
+class UploadedFile(Base):
+    __tablename__ = "uploaded_files"
+    id = Column(Integer, primary_key=True, index=True)
+    tenant_id = Column(Integer, ForeignKey("tenants.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    filename = Column(String(255), nullable=False)
+    file_type = Column(String(50))  # excel, pdf, word, text
+    filepath = Column(String(500))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
