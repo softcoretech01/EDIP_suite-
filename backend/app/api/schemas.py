@@ -29,3 +29,34 @@ class ChatRequest(BaseModel):
     connection_id: int
     question: str
     view_mode: Optional[str] = "chat"
+    session_id: Optional[str] = None
+
+class UserCreate(BaseModel):
+    email: str
+    password: str
+    full_name: str
+    tenant_name: Optional[str] = None
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str
+
+class TokenRefreshRequest(BaseModel):
+    refresh_token: str
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    full_name: Optional[str] = None
+    tenant_id: int
+    is_active: bool
+    roles: List[str] = []
+
+    class Config:
+        from_attributes = True
+

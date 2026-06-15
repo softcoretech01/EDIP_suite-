@@ -1,0 +1,520 @@
+[
+  {
+    "table_name": "Purchase_Masters.grn_Details",
+    "description": "Line items for each GRN — item received, quantity, batch, expiry.",
+    "columns": "grn_item_id (INTEGER): Grn Item reference ID, grn_id (INTEGER): Goods Receipt Note ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), po_qty (DECIMAL(15, 4)): Quantity ordered in the original PO, received_qty (DECIMAL(15, 4)): Quantity of items actually received, batch_lot_number (VARCHAR(100)): Manufacturing batch/lot number of received goods, mfg_date (DATE): Manufacturing date of received goods, expiry_date (DATE): Expiry date of received goods, created_at (DATETIME): Timestamp when record was created",
+    "erp_module": "Procurement",
+    "primary_key": "grn_item_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all grn details records",
+      "Count total grn details this month"
+    ],
+    "vector_text": "Table: Purchase_Masters.grn_Details. Purpose: Line items for each GRN — item received, quantity, batch, expiry. Module: Procurement. Columns: grn_item_id (INTEGER): Grn Item reference ID, grn_id (INTEGER): Goods Receipt Note ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), po_qty (DECIMAL(15, 4)): Quantity ordered in the original PO, received_qty (DECIMAL(15, 4)): Quantity of items actually received, batch_lot_number (VARCHAR(100)): Manufacturing batch/lot number of received goods, mfg_date (DATE): Manufacturing date of received goods, expiry_date (DATE): Expiry date of received goods, created_at (DATETIME): Timestamp when record was created. Relationships: No foreign keys. Sample questions: List all grn details records; Count total grn details this month",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.grn_Header",
+    "description": "Stores Goods Receipt Note (GRN) headers — records of goods physically received from suppliers.",
+    "columns": "grn_id (INTEGER): Goods Receipt Note ID (Primary Key), grn_number (VARCHAR(50)): GRN Reference Number (e.g. GRN-001), po_id (INTEGER): Unique Purchase Order ID (Primary Key), supplier_id (VARCHAR(50)): Supplier/Vendor ID (Foreign Key to masters.suppliers), grn_date (DATE): Date goods were physically received, created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated",
+    "erp_module": "Procurement",
+    "primary_key": "grn_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "How many GRNs were received this month?",
+      "Which GRNs are pending this week?",
+      "List all goods receipts for a specific supplier"
+    ],
+    "vector_text": "Table: Purchase_Masters.grn_Header. Purpose: Stores Goods Receipt Note (GRN) headers — records of goods physically received from suppliers. Module: Procurement. Columns: grn_id (INTEGER): Goods Receipt Note ID (Primary Key), grn_number (VARCHAR(50)): GRN Reference Number (e.g. GRN-001), po_id (INTEGER): Unique Purchase Order ID (Primary Key), supplier_id (VARCHAR(50)): Supplier/Vendor ID (Foreign Key to masters.suppliers), grn_date (DATE): Date goods were physically received, created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated. Relationships: No foreign keys. Sample questions: How many GRNs were received this month?; Which GRNs are pending this week?; List all goods receipts for a specific supplier",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.import_landed_costs_Details",
+    "description": "Per-item cost allocation of import landed costs — allocated overhead, landed unit cost.",
+    "columns": "detail_id (INTEGER): Detail line item ID (Primary Key), import_landed_cost_id (INTEGER): Import Landed Cost ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), qty (DECIMAL(15, 4)): Quantity, fob_val_lcy (DECIMAL(15, 2)): Free-On-Board value in Local Currency, allocated_overhead (DECIMAL(15, 2)): Overhead amount allocated to this specific item, total_landed_cost (DECIMAL(15, 2)): Total landed cost including all charges (duty, freight, insurance), landed_unit_cost (DECIMAL(15, 2)): Cost per unit after allocating all landed costs",
+    "erp_module": "Procurement",
+    "primary_key": "detail_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all import landed costs details records",
+      "Count total import landed costs details this month"
+    ],
+    "vector_text": "Table: Purchase_Masters.import_landed_costs_Details. Purpose: Per-item cost allocation of import landed costs — allocated overhead, landed unit cost. Module: Procurement. Columns: detail_id (INTEGER): Detail line item ID (Primary Key), import_landed_cost_id (INTEGER): Import Landed Cost ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), qty (DECIMAL(15, 4)): Quantity, fob_val_lcy (DECIMAL(15, 2)): Free-On-Board value in Local Currency, allocated_overhead (DECIMAL(15, 2)): Overhead amount allocated to this specific item, total_landed_cost (DECIMAL(15, 2)): Total landed cost including all charges (duty, freight, insurance), landed_unit_cost (DECIMAL(15, 2)): Cost per unit after allocating all landed costs. Relationships: No foreign keys. Sample questions: List all import landed costs details records; Count total import landed costs details this month",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.import_landed_costs_Header",
+    "description": "Stores import landed cost details — customs duty, freight, insurance per import PO.",
+    "columns": "import_landed_cost_id (INTEGER): Import Landed Cost ID (Primary Key), import_po_id (INTEGER): Import Purchase Order ID (Primary Key), duty_percent (DECIMAL(5, 2)): Customs duty percentage applied to import, cess_percent (DECIMAL(5, 2)): CESS surcharge percentage on customs duty, gst_percent (DECIMAL(5, 2)): GST percentage applicable, include_gst (TINYINT): 1 = Include GST in landed cost calculation, 0 = Exclude, sea_freight (DECIMAL(15, 2)): Sea freight charges, road_freight (DECIMAL(15, 2)): Road/land freight charges, local_transport (DECIMAL(15, 2)): Local transport/delivery charges, liner_charges (DECIMAL(15, 2)): Port liner/terminal handling charges, insurance_cost (DECIMAL(15, 2)): Insurance charges, handling_charges (DECIMAL(15, 2)): Handling/loading charges, packing_charges (DECIMAL(15, 2)): Packing charges, aging_charges (DECIMAL(15, 2)): Aging/storage charges, total_customs_duty (DECIMAL(15, 2)): Total customs duty paid, total_freight (DECIMAL(15, 2)): Total freight charges, total_port_charges (DECIMAL(15, 2)): Total port and terminal charges, total_overhead (DECIMAL(15, 2)): Total overhead/additional charges, total_landed_cost (DECIMAL(15, 2)): Total landed cost including all charges (duty, freight, insurance), created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated, is_posted (TINYINT): 1 = Landed cost is finalized/posted, 0 = Draft",
+    "erp_module": "Procurement",
+    "primary_key": "import_landed_cost_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "What is our total import landed cost this year?",
+      "What is the total customs duty paid?",
+      "What is total freight cost on imports?"
+    ],
+    "vector_text": "Table: Purchase_Masters.import_landed_costs_Header. Purpose: Stores import landed cost details — customs duty, freight, insurance per import PO. Module: Procurement. Columns: import_landed_cost_id (INTEGER): Import Landed Cost ID (Primary Key), import_po_id (INTEGER): Import Purchase Order ID (Primary Key), duty_percent (DECIMAL(5, 2)): Customs duty percentage applied to import, cess_percent (DECIMAL(5, 2)): CESS surcharge percentage on customs duty, gst_percent (DECIMAL(5, 2)): GST percentage applicable, include_gst (TINYINT): 1 = Include GST in landed cost calculation, 0 = Exclude, sea_freight (DECIMAL(15, 2)): Sea freight charges, road_freight (DECIMAL(15, 2)): Road/land freight charges, local_transport (DECIMAL(15, 2)): Local transport/delivery charges, liner_charges (DECIMAL(15, 2)): Port liner/terminal handling charges, insurance_cost (DECIMAL(15, 2)): Insurance charges, handling_charges (DECIMAL(15, 2)): Handling/loading charges, packing_charges (DECIMAL(15, 2)): Packing charges, aging_charges (DECIMAL(15, 2)): Aging/storage charges, total_customs_duty (DECIMAL(15, 2)): Total customs duty paid, total_freight (DECIMAL(15, 2)): Total freight charges, total_port_charges (DECIMAL(15, 2)): Total port and terminal charges, total_overhead (DECIMAL(15, 2)): Total overhead/additional charges, total_landed_cost (DECIMAL(15, 2)): Total landed cost including all charges (duty, freight, insurance), created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated, is_posted (TINYINT): 1 = Landed cost is finalized/posted, 0 = Draft. Relationships: No foreign keys. Sample questions: What is our total import landed cost this year?; What is the total customs duty paid?; What is total freight cost on imports?",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.import_purchase_orders_Details",
+    "description": "Line items for Import Purchase Orders — item, foreign currency qty and price.",
+    "columns": "detail_id (INTEGER): Detail line item ID (Primary Key), import_po_id (INTEGER): Import Purchase Order ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), currency_id (INTEGER): Foreign currency ID used for this import PO, qty (DECIMAL(15, 4)): Quantity, fcy_unit_price (DECIMAL(15, 4)): Unit price in Foreign Currency, total_fcy (DECIMAL(15, 2)): Total value in Foreign Currency (FCY)",
+    "erp_module": "Procurement",
+    "primary_key": "detail_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all import purchase orders details records",
+      "Count total import purchase orders details this month"
+    ],
+    "vector_text": "Table: Purchase_Masters.import_purchase_orders_Details. Purpose: Line items for Import Purchase Orders — item, foreign currency qty and price. Module: Procurement. Columns: detail_id (INTEGER): Detail line item ID (Primary Key), import_po_id (INTEGER): Import Purchase Order ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), currency_id (INTEGER): Foreign currency ID used for this import PO, qty (DECIMAL(15, 4)): Quantity, fcy_unit_price (DECIMAL(15, 4)): Unit price in Foreign Currency, total_fcy (DECIMAL(15, 2)): Total value in Foreign Currency (FCY). Relationships: No foreign keys. Sample questions: List all import purchase orders details records; Count total import purchase orders details this month",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.import_purchase_orders_Header",
+    "description": "Stores IMPORT Purchase Order headers — foreign supplier, currency, exchange rate.",
+    "columns": "import_po_id (INTEGER): Import Purchase Order ID (Primary Key), import_po_number (VARCHAR(50)): Import PO Reference Number (e.g. IPO-2026-001), supplier_id (VARCHAR(50)): Supplier/Vendor ID (Foreign Key to masters.suppliers), po_date (DATE): Date the Purchase Order was issued, currency_id (INTEGER): Foreign currency ID used for this import PO, exchange_rate (DECIMAL(10, 4)): Exchange rate at time of PO (Foreign currency to LCY), payment_terms (VARCHAR(100)): Agreed payment terms with supplier (e.g. Net 30, Cash), total_fcy (DECIMAL(15, 2)): Total value in Foreign Currency (FCY), total_lcy (DECIMAL(15, 2)): Total value in Local Currency (LCY/INR), status (VARCHAR(50)): Current status of the record (e.g. Ordered, Received, Cancelled), created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated",
+    "erp_module": "Procurement",
+    "primary_key": "import_po_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "How many import purchase orders are there this month?",
+      "What is the total import spend in LCY this year?",
+      "List all import POs with status and value"
+    ],
+    "vector_text": "Table: Purchase_Masters.import_purchase_orders_Header. Purpose: Stores IMPORT Purchase Order headers — foreign supplier, currency, exchange rate. Module: Procurement. Columns: import_po_id (INTEGER): Import Purchase Order ID (Primary Key), import_po_number (VARCHAR(50)): Import PO Reference Number (e.g. IPO-2026-001), supplier_id (VARCHAR(50)): Supplier/Vendor ID (Foreign Key to masters.suppliers), po_date (DATE): Date the Purchase Order was issued, currency_id (INTEGER): Foreign currency ID used for this import PO, exchange_rate (DECIMAL(10, 4)): Exchange rate at time of PO (Foreign currency to LCY), payment_terms (VARCHAR(100)): Agreed payment terms with supplier (e.g. Net 30, Cash), total_fcy (DECIMAL(15, 2)): Total value in Foreign Currency (FCY), total_lcy (DECIMAL(15, 2)): Total value in Local Currency (LCY/INR), status (VARCHAR(50)): Current status of the record (e.g. Ordered, Received, Cancelled), created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated. Relationships: No foreign keys. Sample questions: How many import purchase orders are there this month?; What is the total import spend in LCY this year?; List all import POs with status and value",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.inventory_batches",
+    "description": "Tracks current inventory batch stock levels — item, current qty, landed cost, selling price.",
+    "columns": "batch_id (INTEGER): Inventory Batch ID (Primary Key), batch_no (VARCHAR(50)): Batch reference number, item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), current_qty (DECIMAL(15, 2)): Current available stock quantity, mfg_date (DATE): Manufacturing date of received goods, expiry_date (DATE): Expiry date of received goods, landed_unit_cost (DECIMAL(15, 4)): Cost per unit after allocating all landed costs, final_selling_price (DECIMAL(15, 4)): Final selling price per unit, margin_percent (DECIMAL(5, 2)): Profit margin percentage, status (VARCHAR(50)): Current status of the record (e.g. Ordered, Received, Cancelled), source_type (ENUM): Source of inventory (Local Purchase, Import, etc.), po_reference (VARCHAR(50)): Po Reference, grn_reference (VARCHAR(50)): Grn Reference, IPO_reference (VARCHAR(50)): Ipo Reference, created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated, is_posted (INTEGER): 1 = Landed cost is finalized/posted, 0 = Draft, inward_qty (DECIMAL(15, 2)): Total quantity received (inward), outward_qty (DECIMAL(15, 2)): Total quantity issued/sold (outward), damaged_qty (DECIMAL(15, 2)): Quantity damaged or written off, damage_remarks (VARCHAR(255)): Damage Remarks",
+    "erp_module": "Inventory",
+    "primary_key": "batch_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "What is the current stock value of all items?",
+      "Which items have zero stock?",
+      "Which items are running low on stock?",
+      "What is the total inventory worth?"
+    ],
+    "vector_text": "Table: Purchase_Masters.inventory_batches. Purpose: Tracks current inventory batch stock levels — item, current qty, landed cost, selling price. Module: Inventory. Columns: batch_id (INTEGER): Inventory Batch ID (Primary Key), batch_no (VARCHAR(50)): Batch reference number, item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), current_qty (DECIMAL(15, 2)): Current available stock quantity, mfg_date (DATE): Manufacturing date of received goods, expiry_date (DATE): Expiry date of received goods, landed_unit_cost (DECIMAL(15, 4)): Cost per unit after allocating all landed costs, final_selling_price (DECIMAL(15, 4)): Final selling price per unit, margin_percent (DECIMAL(5, 2)): Profit margin percentage, status (VARCHAR(50)): Current status of the record (e.g. Ordered, Received, Cancelled), source_type (ENUM): Source of inventory (Local Purchase, Import, etc.), po_reference (VARCHAR(50)): Po Reference, grn_reference (VARCHAR(50)): Grn Reference, IPO_reference (VARCHAR(50)): Ipo Reference, created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated, is_posted (INTEGER): 1 = Landed cost is finalized/posted, 0 = Draft, inward_qty (DECIMAL(15, 2)): Total quantity received (inward), outward_qty (DECIMAL(15, 2)): Total quantity issued/sold (outward), damaged_qty (DECIMAL(15, 2)): Quantity damaged or written off, damage_remarks (VARCHAR(255)): Damage Remarks. Relationships: No foreign keys. Sample questions: What is the current stock value of all items?; Which items have zero stock?; Which items are running low on stock?; What is the total inventory worth?",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.local_landed_cost_Details",
+    "description": "Per-item cost allocation of local landed costs — unit price, allocated overhead.",
+    "columns": "landed_cost_item_id (INTEGER): Landed Cost line item ID (Primary Key), landed_cost_id (INTEGER): Local Landed Cost ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), qty (DECIMAL(15, 4)): Quantity, unit_price (DECIMAL(15, 4)): Price per unit, val_lcy (DECIMAL(15, 2)): Value in Local Currency, allocated_overhead (DECIMAL(15, 2)): Overhead amount allocated to this specific item, total_landed_cost (DECIMAL(15, 2)): Total landed cost including all charges (duty, freight, insurance), landed_unit_cost (DECIMAL(15, 4)): Cost per unit after allocating all landed costs, created_at (DATETIME): Timestamp when record was created",
+    "erp_module": "Procurement",
+    "primary_key": "landed_cost_item_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all local landed cost details records",
+      "Count total local landed cost details this month"
+    ],
+    "vector_text": "Table: Purchase_Masters.local_landed_cost_Details. Purpose: Per-item cost allocation of local landed costs — unit price, allocated overhead. Module: Procurement. Columns: landed_cost_item_id (INTEGER): Landed Cost line item ID (Primary Key), landed_cost_id (INTEGER): Local Landed Cost ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), qty (DECIMAL(15, 4)): Quantity, unit_price (DECIMAL(15, 4)): Price per unit, val_lcy (DECIMAL(15, 2)): Value in Local Currency, allocated_overhead (DECIMAL(15, 2)): Overhead amount allocated to this specific item, total_landed_cost (DECIMAL(15, 2)): Total landed cost including all charges (duty, freight, insurance), landed_unit_cost (DECIMAL(15, 4)): Cost per unit after allocating all landed costs, created_at (DATETIME): Timestamp when record was created. Relationships: No foreign keys. Sample questions: List all local landed cost details records; Count total local landed cost details this month",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.local_landed_cost_Header",
+    "description": "Stores local landed cost details — insurance, handling, freight charges per GRN.",
+    "columns": "landed_cost_id (INTEGER): Local Landed Cost ID (Primary Key), grn_id (INTEGER): Goods Receipt Note ID (Primary Key), insurance_charges (DECIMAL(15, 2)): Insurance Charges, handling_charges (DECIMAL(15, 2)): Handling/loading charges, packing_charges (DECIMAL(15, 2)): Packing charges, aging_charges (DECIMAL(15, 2)): Aging/storage charges, total_lcy (DECIMAL(15, 2)): Total value in Local Currency (LCY/INR), total_overhead (DECIMAL(15, 2)): Total overhead/additional charges, total_landed_cost (DECIMAL(15, 2)): Total landed cost including all charges (duty, freight, insurance), created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated, is_posted (TINYINT): 1 = Landed cost is finalized/posted, 0 = Draft",
+    "erp_module": "Procurement",
+    "primary_key": "landed_cost_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all local landed cost header records",
+      "Count total local landed cost header this month"
+    ],
+    "vector_text": "Table: Purchase_Masters.local_landed_cost_Header. Purpose: Stores local landed cost details — insurance, handling, freight charges per GRN. Module: Procurement. Columns: landed_cost_id (INTEGER): Local Landed Cost ID (Primary Key), grn_id (INTEGER): Goods Receipt Note ID (Primary Key), insurance_charges (DECIMAL(15, 2)): Insurance Charges, handling_charges (DECIMAL(15, 2)): Handling/loading charges, packing_charges (DECIMAL(15, 2)): Packing charges, aging_charges (DECIMAL(15, 2)): Aging/storage charges, total_lcy (DECIMAL(15, 2)): Total value in Local Currency (LCY/INR), total_overhead (DECIMAL(15, 2)): Total overhead/additional charges, total_landed_cost (DECIMAL(15, 2)): Total landed cost including all charges (duty, freight, insurance), created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated, is_posted (TINYINT): 1 = Landed cost is finalized/posted, 0 = Draft. Relationships: No foreign keys. Sample questions: List all local landed cost header records; Count total local landed cost header this month",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.purchase_order_Details",
+    "description": "Stores line items for local Purchase Orders — item, qty, price per PO.",
+    "columns": "po_item_id (INTEGER): Purchase Order line item ID (Primary Key), po_id (INTEGER): Unique Purchase Order ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), quantity (DECIMAL(15, 2)): Quantity, uom (VARCHAR(20)): Uom, unit_price (DECIMAL(15, 2)): Price per unit, tax_rate (DECIMAL(5, 2)): Tax rate percentage applied to line item, line_total (DECIMAL(15, 2)): Total value of this line item (qty × unit_price), created_at (DATETIME): Timestamp when record was created",
+    "erp_module": "Procurement",
+    "primary_key": "po_item_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "What items are in PO-001?",
+      "Which items are most frequently purchased locally?",
+      "What is the total ordered quantity per item this month?"
+    ],
+    "vector_text": "Table: Purchase_Masters.purchase_order_Details. Purpose: Stores line items for local Purchase Orders — item, qty, price per PO. Module: Procurement. Columns: po_item_id (INTEGER): Purchase Order line item ID (Primary Key), po_id (INTEGER): Unique Purchase Order ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), quantity (DECIMAL(15, 2)): Quantity, uom (VARCHAR(20)): Uom, unit_price (DECIMAL(15, 2)): Price per unit, tax_rate (DECIMAL(5, 2)): Tax rate percentage applied to line item, line_total (DECIMAL(15, 2)): Total value of this line item (qty × unit_price), created_at (DATETIME): Timestamp when record was created. Relationships: No foreign keys. Sample questions: What items are in PO-001?; Which items are most frequently purchased locally?; What is the total ordered quantity per item this month?",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.purchase_order_delivery_schedules",
+    "description": "Tracks expected delivery dates and quantities for each local PO.",
+    "columns": "schedule_id (INTEGER): Delivery schedule ID (Primary Key), po_id (INTEGER): Unique Purchase Order ID (Primary Key), expected_delivery_date (DATE): Expected date for PO delivery, target_quantity (DECIMAL(15, 4)): Target quantity for the scheduled delivery, created_at (DATETIME): Timestamp when record was created",
+    "erp_module": "Procurement",
+    "primary_key": "schedule_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all purchase order delivery schedules records",
+      "Count total purchase order delivery schedules this month"
+    ],
+    "vector_text": "Table: Purchase_Masters.purchase_order_delivery_schedules. Purpose: Tracks expected delivery dates and quantities for each local PO. Module: Procurement. Columns: schedule_id (INTEGER): Delivery schedule ID (Primary Key), po_id (INTEGER): Unique Purchase Order ID (Primary Key), expected_delivery_date (DATE): Expected date for PO delivery, target_quantity (DECIMAL(15, 4)): Target quantity for the scheduled delivery, created_at (DATETIME): Timestamp when record was created. Relationships: No foreign keys. Sample questions: List all purchase order delivery schedules records; Count total purchase order delivery schedules this month",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.purchase_orders_Header",
+    "description": "Stores LOCAL Purchase Order headers — supplier, date, totals. One row per PO.",
+    "columns": "po_id (INTEGER): Unique Purchase Order ID (Primary Key), po_number (VARCHAR(50)): Purchase Order Reference Number (e.g. PO-001), pr_id (INTEGER): Purchase Requisition ID (Foreign Key to purchase_requisitions_Header), supplier_id (VARCHAR(50)): Supplier/Vendor ID (Foreign Key to masters.suppliers), po_date (DATE): Date the Purchase Order was issued, payment_terms (VARCHAR(100)): Agreed payment terms with supplier (e.g. Net 30, Cash), sub_total (DECIMAL(15, 2)): PO value before taxes, tax_total (DECIMAL(15, 2)): Total tax amount on the PO, grand_total (DECIMAL(15, 2)): Total PO value including taxes, created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated",
+    "erp_module": "Procurement",
+    "primary_key": "po_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "How many local purchase orders were made this month?",
+      "What is our total local purchase spend this year?",
+      "List all purchase orders with their supplier and total value"
+    ],
+    "vector_text": "Table: Purchase_Masters.purchase_orders_Header. Purpose: Stores LOCAL Purchase Order headers — supplier, date, totals. One row per PO. Module: Procurement. Columns: po_id (INTEGER): Unique Purchase Order ID (Primary Key), po_number (VARCHAR(50)): Purchase Order Reference Number (e.g. PO-001), pr_id (INTEGER): Purchase Requisition ID (Foreign Key to purchase_requisitions_Header), supplier_id (VARCHAR(50)): Supplier/Vendor ID (Foreign Key to masters.suppliers), po_date (DATE): Date the Purchase Order was issued, payment_terms (VARCHAR(100)): Agreed payment terms with supplier (e.g. Net 30, Cash), sub_total (DECIMAL(15, 2)): PO value before taxes, tax_total (DECIMAL(15, 2)): Total tax amount on the PO, grand_total (DECIMAL(15, 2)): Total PO value including taxes, created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated. Relationships: No foreign keys. Sample questions: How many local purchase orders were made this month?; What is our total local purchase spend this year?; List all purchase orders with their supplier and total value",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.purchase_requisition_Details",
+    "description": "Line items for each Purchase Requisition — item, qty, unit price.",
+    "columns": "pr_id (INTEGER): Purchase Requisition ID (Foreign Key to purchase_requisitions_Header), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), requested_quantity (DECIMAL(15, 2)): Quantity requested in the requisition, uom (VARCHAR(20)): Uom, reason_for_request (TEXT): Business reason for the purchase request, created_at (TIMESTAMP): Timestamp when record was created, unit_price (DECIMAL(15, 2)): Price per unit, total_price (DECIMAL(15, 2)): Monetary value — total price",
+    "erp_module": "Procurement",
+    "primary_key": "",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all purchase requisition details records",
+      "Count total purchase requisition details this month"
+    ],
+    "vector_text": "Table: Purchase_Masters.purchase_requisition_Details. Purpose: Line items for each Purchase Requisition — item, qty, unit price. Module: Procurement. Columns: pr_id (INTEGER): Purchase Requisition ID (Foreign Key to purchase_requisitions_Header), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), requested_quantity (DECIMAL(15, 2)): Quantity requested in the requisition, uom (VARCHAR(20)): Uom, reason_for_request (TEXT): Business reason for the purchase request, created_at (TIMESTAMP): Timestamp when record was created, unit_price (DECIMAL(15, 2)): Price per unit, total_price (DECIMAL(15, 2)): Monetary value — total price. Relationships: No foreign keys. Sample questions: List all purchase requisition details records; Count total purchase requisition details this month",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.purchase_requisitions_Header",
+    "description": "Stores Purchase Requisition (PR) headers — department requests for goods/services.",
+    "columns": "pr_id (BIGINT): Purchase Requisition ID (Foreign Key to purchase_requisitions_Header), pr_number (VARCHAR(50)): Purchase Requisition Reference Number, pr_date (DATE): Date the requisition was raised, required_by_date (DATE): Date by which items are needed, department (VARCHAR(100)): Department that raised the requisition, requested_by (INTEGER): Employee who requested the items, notes (TEXT): Notes, created_at (TIMESTAMP): Timestamp when record was created, updated_at (TIMESTAMP): Timestamp when record was last updated, priority (VARCHAR(50)): Priority level of the requisition (High/Medium/Low)",
+    "erp_module": "Procurement",
+    "primary_key": "pr_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "How many purchase requisitions are open this month?",
+      "Which purchase requisitions are not converted to PO?",
+      "List PRs by department"
+    ],
+    "vector_text": "Table: Purchase_Masters.purchase_requisitions_Header. Purpose: Stores Purchase Requisition (PR) headers — department requests for goods/services. Module: Procurement. Columns: pr_id (BIGINT): Purchase Requisition ID (Foreign Key to purchase_requisitions_Header), pr_number (VARCHAR(50)): Purchase Requisition Reference Number, pr_date (DATE): Date the requisition was raised, required_by_date (DATE): Date by which items are needed, department (VARCHAR(100)): Department that raised the requisition, requested_by (INTEGER): Employee who requested the items, notes (TEXT): Notes, created_at (TIMESTAMP): Timestamp when record was created, updated_at (TIMESTAMP): Timestamp when record was last updated, priority (VARCHAR(50)): Priority level of the requisition (High/Medium/Low). Relationships: No foreign keys. Sample questions: How many purchase requisitions are open this month?; Which purchase requisitions are not converted to PO?; List PRs by department",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.purchase_return_Details",
+    "description": "Line items for Purchase Returns — returned item, qty, reason.",
+    "columns": "return_item_id (INTEGER): Return line item ID (Primary Key), return_id (INTEGER): Purchase Return ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), inwarded_qty (DECIMAL(15, 4)): Quantity that was originally received (inward qty), return_qty (DECIMAL(15, 4)): Quantity returned to supplier, return_reason (VARCHAR(255)): Reason for returning goods to supplier, created_at (DATETIME): Timestamp when record was created",
+    "erp_module": "Procurement",
+    "primary_key": "return_item_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all purchase return details records",
+      "Count total purchase return details this month"
+    ],
+    "vector_text": "Table: Purchase_Masters.purchase_return_Details. Purpose: Line items for Purchase Returns — returned item, qty, reason. Module: Procurement. Columns: return_item_id (INTEGER): Return line item ID (Primary Key), return_id (INTEGER): Purchase Return ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), inwarded_qty (DECIMAL(15, 4)): Quantity that was originally received (inward qty), return_qty (DECIMAL(15, 4)): Quantity returned to supplier, return_reason (VARCHAR(255)): Reason for returning goods to supplier, created_at (DATETIME): Timestamp when record was created. Relationships: No foreign keys. Sample questions: List all purchase return details records; Count total purchase return details this month",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Purchase_Masters.purchase_return_Header",
+    "description": "Stores Purchase Return headers — items returned to suppliers with debit note status.",
+    "columns": "return_id (INTEGER): Purchase Return ID (Primary Key), return_number (VARCHAR(50)): Return Reference Number, grn_id (INTEGER): Goods Receipt Note ID (Primary Key), supplier_id (VARCHAR(50)): Supplier/Vendor ID (Foreign Key to masters.suppliers), return_date (DATE): Date goods were returned to supplier, debit_note_status (VARCHAR(50)): Status of debit note raised against supplier (Pending/Approved), refund_total (DECIMAL(15, 2)): Total refund amount from supplier, created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated",
+    "erp_module": "Procurement",
+    "primary_key": "return_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "How many purchase returns were made this month?",
+      "What is the total refund value from supplier returns?",
+      "List all pending debit notes"
+    ],
+    "vector_text": "Table: Purchase_Masters.purchase_return_Header. Purpose: Stores Purchase Return headers — items returned to suppliers with debit note status. Module: Procurement. Columns: return_id (INTEGER): Purchase Return ID (Primary Key), return_number (VARCHAR(50)): Return Reference Number, grn_id (INTEGER): Goods Receipt Note ID (Primary Key), supplier_id (VARCHAR(50)): Supplier/Vendor ID (Foreign Key to masters.suppliers), return_date (DATE): Date goods were returned to supplier, debit_note_status (VARCHAR(50)): Status of debit note raised against supplier (Pending/Approved), refund_total (DECIMAL(15, 2)): Total refund amount from supplier, created_at (DATETIME): Timestamp when record was created, updated_at (DATETIME): Timestamp when record was last updated. Relationships: No foreign keys. Sample questions: How many purchase returns were made this month?; What is the total refund value from supplier returns?; List all pending debit notes",
+    "schema": "Purchase_Masters"
+  },
+  {
+    "table_name": "Sales_Masters.Invoice_Details",
+    "description": "Line items for Sales Invoices — item, qty, unit price.",
+    "columns": "id (INTEGER): Id, invoice_id (VARCHAR(50)): Sales Invoice ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), name (VARCHAR(150)): Name of the item/supplier/customer, ordered_qty (DECIMAL(10, 2)): Quantity ordered by customer, supplied_qty (DECIMAL(10, 2)): Quantity already supplied/delivered, pending_qty (DECIMAL(10, 2)): Quantity yet to be supplied (ordered - supplied), unit_price (DECIMAL(15, 2)): Price per unit",
+    "erp_module": "Finance / Sales",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all invoice details records",
+      "Count total invoice details this month"
+    ],
+    "vector_text": "Table: Sales_Masters.Invoice_Details. Purpose: Line items for Sales Invoices — item, qty, unit price. Module: Finance / Sales. Columns: id (INTEGER): Id, invoice_id (VARCHAR(50)): Sales Invoice ID (Primary Key), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), name (VARCHAR(150)): Name of the item/supplier/customer, ordered_qty (DECIMAL(10, 2)): Quantity ordered by customer, supplied_qty (DECIMAL(10, 2)): Quantity already supplied/delivered, pending_qty (DECIMAL(10, 2)): Quantity yet to be supplied (ordered - supplied), unit_price (DECIMAL(15, 2)): Price per unit. Relationships: No foreign keys. Sample questions: List all invoice details records; Count total invoice details this month",
+    "schema": "Sales_Masters"
+  },
+  {
+    "table_name": "Sales_Masters.Invoice_Header",
+    "description": "Stores Sales Invoice headers — customer, amount, tax, total value.",
+    "columns": "invoice_id (VARCHAR(50)): Sales Invoice ID (Primary Key), so_id (VARCHAR(50)): Sales Order ID (Foreign Key to SalesOrder_Header), cpo_ref (VARCHAR(50)): Customer Purchase Order Reference number, customer_name (VARCHAR(150)): Customer name on the sales order, amount (DECIMAL(15, 2)): Invoice amount before tax, tax_amount (DECIMAL(15, 2)): Tax amount on invoice, tax_type (VARCHAR(10)): Type of tax applied (e.g. GST, VAT), total (DECIMAL(15, 2)): Total invoice value (amount + tax) — USE THIS for invoice amounts, created_at (TIMESTAMP): Timestamp when record was created, updated_at (TIMESTAMP): Timestamp when record was last updated",
+    "erp_module": "Finance / Sales",
+    "primary_key": "invoice_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "What is our total revenue this month?",
+      "Who are our top 10 customers by revenue?",
+      "What is the highest value invoice this month?",
+      "What is the total invoiced amount this year?"
+    ],
+    "vector_text": "Table: Sales_Masters.Invoice_Header. Purpose: Stores Sales Invoice headers — customer, amount, tax, total value. Module: Finance / Sales. Columns: invoice_id (VARCHAR(50)): Sales Invoice ID (Primary Key), so_id (VARCHAR(50)): Sales Order ID (Foreign Key to SalesOrder_Header), cpo_ref (VARCHAR(50)): Customer Purchase Order Reference number, customer_name (VARCHAR(150)): Customer name on the sales order, amount (DECIMAL(15, 2)): Invoice amount before tax, tax_amount (DECIMAL(15, 2)): Tax amount on invoice, tax_type (VARCHAR(10)): Type of tax applied (e.g. GST, VAT), total (DECIMAL(15, 2)): Total invoice value (amount + tax) — USE THIS for invoice amounts, created_at (TIMESTAMP): Timestamp when record was created, updated_at (TIMESTAMP): Timestamp when record was last updated. Relationships: No foreign keys. Sample questions: What is our total revenue this month?; Who are our top 10 customers by revenue?; What is the highest value invoice this month?; What is the total invoiced amount this year?",
+    "schema": "Sales_Masters"
+  },
+  {
+    "table_name": "Sales_Masters.SalesOrder_Details",
+    "description": "Line items for Sales Orders — item, ordered qty, supplied qty, pending qty.",
+    "columns": "so_details_id (INTEGER): Sales Order detail line item ID (Primary Key), So_number (VARCHAR(50)): Sales Order Reference Number (e.g. SO-001), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), name (VARCHAR(150)): Name of the item/supplier/customer, ordered_qty (DECIMAL(10, 2)): Quantity ordered by customer, supplied_qty (DECIMAL(10, 2)): Quantity already supplied/delivered, pending_qty (DECIMAL(10, 2)): Quantity yet to be supplied (ordered - supplied), unit_price (DECIMAL(15, 2)): Price per unit",
+    "erp_module": "Sales",
+    "primary_key": "so_details_id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all salesorder details records",
+      "Count total salesorder details this month"
+    ],
+    "vector_text": "Table: Sales_Masters.SalesOrder_Details. Purpose: Line items for Sales Orders — item, ordered qty, supplied qty, pending qty. Module: Sales. Columns: so_details_id (INTEGER): Sales Order detail line item ID (Primary Key), So_number (VARCHAR(50)): Sales Order Reference Number (e.g. SO-001), item_id (VARCHAR(50)): Item/Product ID (Foreign Key to masters.items), name (VARCHAR(150)): Name of the item/supplier/customer, ordered_qty (DECIMAL(10, 2)): Quantity ordered by customer, supplied_qty (DECIMAL(10, 2)): Quantity already supplied/delivered, pending_qty (DECIMAL(10, 2)): Quantity yet to be supplied (ordered - supplied), unit_price (DECIMAL(15, 2)): Price per unit. Relationships: No foreign keys. Sample questions: List all salesorder details records; Count total salesorder details this month",
+    "schema": "Sales_Masters"
+  },
+  {
+    "table_name": "Sales_Masters.SalesOrder_Header",
+    "description": "Stores Sales Order (SO) headers — customer, date, delivery schedule.",
+    "columns": "id (VARCHAR(50)): Id, So_number (VARCHAR(50)): Sales Order Reference Number (e.g. SO-001), customer_name (VARCHAR(150)): Customer name on the sales order, date (DATE): Sales Order date, delivery_schedule (DATE): Scheduled delivery date for the order, invoice_generated (TINYINT): 1 = Invoice has been generated, 0 = Pending invoice, created_at (TIMESTAMP): Timestamp when record was created, updated_at (TIMESTAMP): Timestamp when record was last updated",
+    "erp_module": "Sales",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "How many sales orders were created this month?",
+      "How many sales orders are pending delivery?",
+      "What is our total sales order value this quarter?"
+    ],
+    "vector_text": "Table: Sales_Masters.SalesOrder_Header. Purpose: Stores Sales Order (SO) headers — customer, date, delivery schedule. Module: Sales. Columns: id (VARCHAR(50)): Id, So_number (VARCHAR(50)): Sales Order Reference Number (e.g. SO-001), customer_name (VARCHAR(150)): Customer name on the sales order, date (DATE): Sales Order date, delivery_schedule (DATE): Scheduled delivery date for the order, invoice_generated (TINYINT): 1 = Invoice has been generated, 0 = Pending invoice, created_at (TIMESTAMP): Timestamp when record was created, updated_at (TIMESTAMP): Timestamp when record was last updated. Relationships: No foreign keys. Sample questions: How many sales orders were created this month?; How many sales orders are pending delivery?; What is our total sales order value this quarter?",
+    "schema": "Sales_Masters"
+  },
+  {
+    "table_name": "masters.currencies",
+    "description": "Stores currencies records.",
+    "columns": "id (INTEGER): Id, code (VARCHAR(10)): Code, name (VARCHAR(100)): Name of the item/supplier/customer, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby",
+    "erp_module": "General",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all currencies records",
+      "Count total currencies this month"
+    ],
+    "vector_text": "Table: masters.currencies. Purpose: Stores currencies records. Module: General. Columns: id (INTEGER): Id, code (VARCHAR(10)): Code, name (VARCHAR(100)): Name of the item/supplier/customer, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby. Relationships: No foreign keys. Sample questions: List all currencies records; Count total currencies this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.customer_types",
+    "description": "Stores customer types records.",
+    "columns": "id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, label (VARCHAR(100)): Label, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby",
+    "erp_module": "Customer",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all customer types records",
+      "Count total customer types this month"
+    ],
+    "vector_text": "Table: masters.customer_types. Purpose: Stores customer types records. Module: Customer. Columns: id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, label (VARCHAR(100)): Label, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby. Relationships: No foreign keys. Sample questions: List all customer types records; Count total customer types this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.customers",
+    "description": "Master list of all customers/clients — name, contact, credit limit, payment terms.",
+    "columns": "id (VARCHAR(50)): Id, name (VARCHAR(255)): Name of the item/supplier/customer, email (VARCHAR(255)): Email, phone (VARCHAR(50)): Phone, customer_type_id (INTEGER): Customer Type reference ID, active (TINYINT): 1 = Active record, 0 = Inactive/disabled, billingAddress (LONGTEXT): Billingaddress, shippingAddress (LONGTEXT): Shippingaddress, gstDetails (LONGTEXT): Gstdetails, creditLimit (DECIMAL(12, 2)): Maximum credit amount allowed for the customer, payment_term_id (INTEGER): Payment Term reference ID, price_category_id (INTEGER): Price Category reference ID, contactPersons (LONGTEXT): Contactpersons, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby, sales_person_id (INTEGER): Sales Person reference ID",
+    "erp_module": "Customer",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all customers records",
+      "Count total customers this month"
+    ],
+    "vector_text": "Table: masters.customers. Purpose: Master list of all customers/clients — name, contact, credit limit, payment terms. Module: Customer. Columns: id (VARCHAR(50)): Id, name (VARCHAR(255)): Name of the item/supplier/customer, email (VARCHAR(255)): Email, phone (VARCHAR(50)): Phone, customer_type_id (INTEGER): Customer Type reference ID, active (TINYINT): 1 = Active record, 0 = Inactive/disabled, billingAddress (LONGTEXT): Billingaddress, shippingAddress (LONGTEXT): Shippingaddress, gstDetails (LONGTEXT): Gstdetails, creditLimit (DECIMAL(12, 2)): Maximum credit amount allowed for the customer, payment_term_id (INTEGER): Payment Term reference ID, price_category_id (INTEGER): Price Category reference ID, contactPersons (LONGTEXT): Contactpersons, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby, sales_person_id (INTEGER): Sales Person reference ID. Relationships: No foreign keys. Sample questions: List all customers records; Count total customers this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.documents",
+    "description": "Stores documents records.",
+    "columns": "id (VARCHAR(50)): Id, name (VARCHAR(255)): Name of the item/supplier/customer, category (VARCHAR(100)): Category, uploaded_by (VARCHAR(100)): Uploaded By, upload_date (DATE): Date field for upload, size (VARCHAR(50)): Size specification of the item, version (INTEGER): Version, linked_transaction (VARCHAR(100)): Linked Transaction, file_path (VARCHAR(500)): File Path, history (LONGTEXT): History",
+    "erp_module": "General",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all documents records",
+      "Count total documents this month"
+    ],
+    "vector_text": "Table: masters.documents. Purpose: Stores documents records. Module: General. Columns: id (VARCHAR(50)): Id, name (VARCHAR(255)): Name of the item/supplier/customer, category (VARCHAR(100)): Category, uploaded_by (VARCHAR(100)): Uploaded By, upload_date (DATE): Date field for upload, size (VARCHAR(50)): Size specification of the item, version (INTEGER): Version, linked_transaction (VARCHAR(100)): Linked Transaction, file_path (VARCHAR(500)): File Path, history (LONGTEXT): History. Relationships: No foreign keys. Sample questions: List all documents records; Count total documents this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.gst_rates",
+    "description": "Stores gst rates records.",
+    "columns": "id (INTEGER): Id, rate (INTEGER): Rate, name (VARCHAR(50)): Name of the item/supplier/customer, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby",
+    "erp_module": "General",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all gst rates records",
+      "Count total gst rates this month"
+    ],
+    "vector_text": "Table: masters.gst_rates. Purpose: Stores gst rates records. Module: General. Columns: id (INTEGER): Id, rate (INTEGER): Rate, name (VARCHAR(50)): Name of the item/supplier/customer, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby. Relationships: No foreign keys. Sample questions: List all gst rates records; Count total gst rates this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.item_categories",
+    "description": "Stores item categories records.",
+    "columns": "id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, groupId (INTEGER): Groupid, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedBy (VARCHAR(100)): Modifiedby, modifiedDate (DATETIME): Modifieddate",
+    "erp_module": "Inventory",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all item categories records",
+      "Count total item categories this month"
+    ],
+    "vector_text": "Table: masters.item_categories. Purpose: Stores item categories records. Module: Inventory. Columns: id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, groupId (INTEGER): Groupid, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedBy (VARCHAR(100)): Modifiedby, modifiedDate (DATETIME): Modifieddate. Relationships: No foreign keys. Sample questions: List all item categories records; Count total item categories this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.item_groups",
+    "description": "Stores item groups records.",
+    "columns": "id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby",
+    "erp_module": "Inventory",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all item groups records",
+      "Count total item groups this month"
+    ],
+    "vector_text": "Table: masters.item_groups. Purpose: Stores item groups records. Module: Inventory. Columns: id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby. Relationships: No foreign keys. Sample questions: List all item groups records; Count total item groups this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.items",
+    "description": "Master catalog of all inventory items — name, category, brand, UOM, min stock, reorder level, standard price.",
+    "columns": "id (VARCHAR(50)): Id, name (VARCHAR(100)): Name of the item/supplier/customer, group_id (INTEGER): Item group/family classification, category_id (INTEGER): Item category classification, brand (VARCHAR(100)): Brand name of the item, model (VARCHAR(100)): Model number of the item, size (VARCHAR(100)): Size specification of the item, color (VARCHAR(100)): Color of the item, uom_id (INTEGER): Unit of Measure ID (e.g. KG, Piece, Liter), hsnCode (INTEGER): HSN (Harmonized System Nomenclature) code for tax purposes, gst_percent_id (INTEGER): Gst Percent reference ID, minStock (INTEGER): Minimum stock level — alert if stock falls below this, reorderLevel (INTEGER): Reorder point — trigger purchase when stock reaches this level, batchApplicable (BIT): Batchapplicable, serialApplicable (BIT): Serialapplicable, isImported (BIT): 1 = Item is imported, 0 = Locally sourced, active (BIT): 1 = Active record, 0 = Inactive/disabled, standardPrice (DECIMAL(10, 2)): Standard selling price of the item, buildersPrice (DECIMAL(10, 2)): Buildersprice, dealersPrice (DECIMAL(10, 2)): Dealersprice, contractorsPrice (DECIMAL(10, 2)): Contractorsprice, houseOwnersPrice (DECIMAL(10, 2)): Houseownersprice, image (VARCHAR(255)): Image, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedBy (VARCHAR(100)): Modifiedby, modifiedDate (DATETIME): Modifieddate",
+    "erp_module": "Inventory",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "Which items have exceeded their reorder level?",
+      "List all imported items",
+      "What items are in the low stock alert?"
+    ],
+    "vector_text": "Table: masters.items. Purpose: Master catalog of all inventory items — name, category, brand, UOM, min stock, reorder level, standard price. Module: Inventory. Columns: id (VARCHAR(50)): Id, name (VARCHAR(100)): Name of the item/supplier/customer, group_id (INTEGER): Item group/family classification, category_id (INTEGER): Item category classification, brand (VARCHAR(100)): Brand name of the item, model (VARCHAR(100)): Model number of the item, size (VARCHAR(100)): Size specification of the item, color (VARCHAR(100)): Color of the item, uom_id (INTEGER): Unit of Measure ID (e.g. KG, Piece, Liter), hsnCode (INTEGER): HSN (Harmonized System Nomenclature) code for tax purposes, gst_percent_id (INTEGER): Gst Percent reference ID, minStock (INTEGER): Minimum stock level — alert if stock falls below this, reorderLevel (INTEGER): Reorder point — trigger purchase when stock reaches this level, batchApplicable (BIT): Batchapplicable, serialApplicable (BIT): Serialapplicable, isImported (BIT): 1 = Item is imported, 0 = Locally sourced, active (BIT): 1 = Active record, 0 = Inactive/disabled, standardPrice (DECIMAL(10, 2)): Standard selling price of the item, buildersPrice (DECIMAL(10, 2)): Buildersprice, dealersPrice (DECIMAL(10, 2)): Dealersprice, contractorsPrice (DECIMAL(10, 2)): Contractorsprice, houseOwnersPrice (DECIMAL(10, 2)): Houseownersprice, image (VARCHAR(255)): Image, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedBy (VARCHAR(100)): Modifiedby, modifiedDate (DATETIME): Modifieddate. Relationships: No foreign keys. Sample questions: Which items have exceeded their reorder level?; List all imported items; What items are in the low stock alert?",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.payment_terms",
+    "description": "Stores payment terms records.",
+    "columns": "id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, label (VARCHAR(100)): Label, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby",
+    "erp_module": "Finance",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all payment terms records",
+      "Count total payment terms this month"
+    ],
+    "vector_text": "Table: masters.payment_terms. Purpose: Stores payment terms records. Module: Finance. Columns: id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, label (VARCHAR(100)): Label, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby. Relationships: No foreign keys. Sample questions: List all payment terms records; Count total payment terms this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.price_categories",
+    "description": "Stores price categories records.",
+    "columns": "id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, label (VARCHAR(100)): Label, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby",
+    "erp_module": "General",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all price categories records",
+      "Count total price categories this month"
+    ],
+    "vector_text": "Table: masters.price_categories. Purpose: Stores price categories records. Module: General. Columns: id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, label (VARCHAR(100)): Label, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby. Relationships: No foreign keys. Sample questions: List all price categories records; Count total price categories this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.role_permissions",
+    "description": "Stores role permissions records.",
+    "columns": "role_name (VARCHAR(100)): Role Name, permissions (LONGTEXT): Permissions",
+    "erp_module": "General",
+    "primary_key": "role_name",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all role permissions records",
+      "Count total role permissions this month"
+    ],
+    "vector_text": "Table: masters.role_permissions. Purpose: Stores role permissions records. Module: General. Columns: role_name (VARCHAR(100)): Role Name, permissions (LONGTEXT): Permissions. Relationships: No foreign keys. Sample questions: List all role permissions records; Count total role permissions this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.supplier_types",
+    "description": "Stores supplier types records.",
+    "columns": "id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, label (VARCHAR(100)): Label, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby",
+    "erp_module": "Supplier",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all supplier types records",
+      "Count total supplier types this month"
+    ],
+    "vector_text": "Table: masters.supplier_types. Purpose: Stores supplier types records. Module: Supplier. Columns: id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, label (VARCHAR(100)): Label, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby. Relationships: No foreign keys. Sample questions: List all supplier types records; Count total supplier types this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.suppliers",
+    "description": "Master list of all suppliers/vendors — name, contact, type, payment terms, currency.",
+    "columns": "id (VARCHAR(50)): Id, name (VARCHAR(255)): Name of the item/supplier/customer, email (VARCHAR(255)): Email, phone (VARCHAR(100)): Phone, type (INTEGER): Type, currency (INTEGER): Currency, leadTime (INTEGER): Supplier lead time in days, active (TINYINT): 1 = Active record, 0 = Inactive/disabled, taxDetails (LONGTEXT): Taxdetails, paymentTerms (INTEGER): Paymentterms, importDetails (LONGTEXT): Importdetails, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby",
+    "erp_module": "Supplier",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "Which supplier do we buy from the most?",
+      "List all active suppliers",
+      "Which supplier has the highest total purchase value?"
+    ],
+    "vector_text": "Table: masters.suppliers. Purpose: Master list of all suppliers/vendors — name, contact, type, payment terms, currency. Module: Supplier. Columns: id (VARCHAR(50)): Id, name (VARCHAR(255)): Name of the item/supplier/customer, email (VARCHAR(255)): Email, phone (VARCHAR(100)): Phone, type (INTEGER): Type, currency (INTEGER): Currency, leadTime (INTEGER): Supplier lead time in days, active (TINYINT): 1 = Active record, 0 = Inactive/disabled, taxDetails (LONGTEXT): Taxdetails, paymentTerms (INTEGER): Paymentterms, importDetails (LONGTEXT): Importdetails, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby. Relationships: No foreign keys. Sample questions: Which supplier do we buy from the most?; List all active suppliers; Which supplier has the highest total purchase value?",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.tax_registration_types",
+    "description": "Stores tax registration types records.",
+    "columns": "id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, label (VARCHAR(100)): Label, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby",
+    "erp_module": "Finance",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all tax registration types records",
+      "Count total tax registration types this month"
+    ],
+    "vector_text": "Table: masters.tax_registration_types. Purpose: Stores tax registration types records. Module: Finance. Columns: id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, label (VARCHAR(100)): Label, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby. Relationships: No foreign keys. Sample questions: List all tax registration types records; Count total tax registration types this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.uoms",
+    "description": "Stores uoms records.",
+    "columns": "id (INTEGER): Id, name (VARCHAR(50)): Name of the item/supplier/customer, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby",
+    "erp_module": "Masters",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all uoms records",
+      "Count total uoms this month"
+    ],
+    "vector_text": "Table: masters.uoms. Purpose: Stores uoms records. Module: Masters. Columns: id (INTEGER): Id, name (VARCHAR(50)): Name of the item/supplier/customer, updatedBy (VARCHAR(100)): Updatedby, updatedDate (DATETIME): Updateddate, modifiedDate (DATETIME): Modifieddate, modifiedBy (VARCHAR(100)): Modifiedby. Relationships: No foreign keys. Sample questions: List all uoms records; Count total uoms this month",
+    "schema": "masters"
+  },
+  {
+    "table_name": "masters.users",
+    "description": "Stores users records.",
+    "columns": "id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, role (VARCHAR(100)): Role, email (VARCHAR(100)): Email, department (VARCHAR(100)): Department that raised the requisition, status (VARCHAR(50)): Current status of the record (e.g. Ordered, Received, Cancelled), monthly_target (DECIMAL(15, 2)): Monthly Target",
+    "erp_module": "General",
+    "primary_key": "id",
+    "foreign_keys": "No foreign keys",
+    "example_queries": [
+      "List all users records",
+      "Count total users this month"
+    ],
+    "vector_text": "Table: masters.users. Purpose: Stores users records. Module: General. Columns: id (INTEGER): Id, name (VARCHAR(100)): Name of the item/supplier/customer, role (VARCHAR(100)): Role, email (VARCHAR(100)): Email, department (VARCHAR(100)): Department that raised the requisition, status (VARCHAR(50)): Current status of the record (e.g. Ordered, Received, Cancelled), monthly_target (DECIMAL(15, 2)): Monthly Target. Relationships: No foreign keys. Sample questions: List all users records; Count total users this month",
+    "schema": "masters"
+  }
+]

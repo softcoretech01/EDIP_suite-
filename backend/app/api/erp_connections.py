@@ -4,7 +4,7 @@ from typing import List
 from ..database.database import get_db
 from ..models import models
 from . import schemas
-from ..auth.auth import get_current_user
+from ..auth.auth import get_current_user, HasPermission
 import sqlalchemy
 
 router = APIRouter(
@@ -34,7 +34,7 @@ def build_connection_string(req: schemas.TestConnectionRequest) -> str:
         raise ValueError(f"Unsupported database type: {req.db_type}")
 
 @router.post("/test-connection")
-def test_connection(req: schemas.TestConnectionRequest, current_user: models.User = Depends(get_current_user)):
+def test_connection(req: schemas.TestConnectionRequest, current_user: models.User = Depends(HasPermission("manage_erp"))):
     try:
         connection_url = build_connection_string(req)
         engine = sqlalchemy.create_engine(connection_url, connect_args={"connect_timeout": 5})
@@ -46,7 +46,7 @@ def test_connection(req: schemas.TestConnectionRequest, current_user: models.Use
         raise HTTPException(status_code=400, detail=f"Connection failed: {str(e)}")
 
 @router.post("/save-connection", response_model=schemas.ERPConnectionResponse)
-def save_connection(conn_data: schemas.ERPConnectionCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+def save_connection(conn_data: schemas.ERPConnectionCreate, db: Session = Depends(get_db), current_user: models.User = Depends(HasPermission("manage_erp"))):
     # Basic encryption mock for now - in production use cryptography fernet
     encrypted_pass = f"enc_{conn_data.password}" 
     
@@ -65,6 +65,7 @@ def save_connection(conn_data: schemas.ERPConnectionCreate, db: Session = Depend
     return new_conn
 
 @router.get("/connections", response_model=List[schemas.ERPConnectionResponse])
-def get_connections(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+def get_connections(db: Session = Depends(get_db), current_user: models.User = Depends(HasPermission("view_dashboard"))):
     connections = db.query(models.ERPConnection).filter(models.ERPConnection.tenant_id == current_user.tenant_id).all()
     return connections
+

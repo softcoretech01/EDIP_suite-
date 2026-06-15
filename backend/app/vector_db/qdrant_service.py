@@ -114,21 +114,27 @@ class QdrantService:
     def upsert_table_metadata(self, tenant_id: int, connection_id: int, table_name: str, description: str, columns: list, vector: list):
         """
         Store a table's metadata and its embedding.
+        Uses a deterministic ID so re-indexing the same table always overwrites
+        the same Qdrant point — no duplicate buildup in local file storage.
         """
+        import hashlib
+        key = f"{tenant_id}:{connection_id}:{table_name}"
+        point_id = int(hashlib.md5(key.encode()).hexdigest()[:15], 16)
+
         payload = {
             "tenant_id": tenant_id,
             "connection_id": connection_id,
             "table_name": table_name,
             "description": description,
-            "columns": columns # List of column names/types
+            "columns": columns
         }
-        
+
         point = PointStruct(
-            id=str(uuid.uuid4()),
+            id=point_id,
             vector=vector,
             payload=payload
         )
-        
+
         self.client.upsert(
             collection_name=self.collection_name,
             wait=True,

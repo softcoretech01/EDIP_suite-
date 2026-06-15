@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from app.database.mysql import test_connection as test_mysql
 from app.vector_db.qdrant_service import test_qdrant_connection
 

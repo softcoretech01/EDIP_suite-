@@ -1,0 +1,249 @@
+{
+  "total_tested": 10,
+  "successful": 10,
+  "results": [
+    [
+      "General",
+      {
+        "question": "What is an ERP system?",
+        "status_code": 200,
+        "elapsed_seconds": 8.13,
+        "response": {
+          "summary": "I'm EDIP AI, your ERP Business Assistant.\n\nWhat is an ERP system?\n\n\ud83d\udcd8 Definition of ERP System\n\nDefinition:\nEnterprise Resource Planning (ERP) system is a software solution that integrates various business functions into a single platform to manage and automate processes.\n\nKey Activities:\n\u2022 Centralized data management\n\u2022 Process automation\n\u2022 Real-time reporting\n\nRelated Modules:\n\u2022 Financial Management\n\u2022 Human Resources\n\u2022 Supply Chain Management\n\nQuick Difference: ERP systems differ from traditional accounting software in their ability to integrate multiple business functions, providing a more holistic view of the organization.",
+          "data": [],
+          "chart_type": "text",
+          "executive_summary": "I'm EDIP AI, your ERP Business Assistant.\n\nWhat is an ERP system?\n\n\ud83d\udcd8 Definition of ERP System\n\nDefinition:\nEnterprise Resource Planning (ERP) system is a software solution that integrates various business functions into a single platform to manage and automate processes.\n\nKey Activities:\n\u2022 Centralized data management\n\u2022 Process automation\n\u2022 Real-time reporting\n\nRelated Modules:\n\u2022 Financial Management\n\u2022 Human Resources\n\u2022 Supply Chain Management\n\nQuick Difference: ERP systems differ from traditional accounting software in their ability to integrate multiple business functions, providing a more holistic view of the organization.",
+          "business_insights": [],
+          "recommendations": []
+        }
+      }
+    ],
+    [
+      "General",
+      {
+        "question": "What does ERP stand for?",
+        "status_code": 200,
+        "elapsed_seconds": 7.28,
+        "response": {
+          "summary": "I'm EDIP AI, your ERP Business Assistant.\n\nWhat does ERP stand for?\n\n\ud83d\udcd8 Definition of ERP\n\nDefinition: Enterprise Resource Planning\n\nKey Activities:\n\u2022 Implementation and configuration\n\u2022 Data integration and management\n\u2022 Process optimization\n\nRelated Modules:\n\u2022 Financial Management\n\u2022 Human Capital Management\n\u2022 Supply Chain Management\n\nQuick Difference (if comparing concepts):\nERP is a comprehensive software solution that integrates various business functions, whereas CRM (Customer Relationship Management) focuses on customer interactions and relationships.",
+          "data": [],
+          "chart_type": "text",
+          "executive_summary": "I'm EDIP AI, your ERP Business Assistant.\n\nWhat does ERP stand for?\n\n\ud83d\udcd8 Definition of ERP\n\nDefinition: Enterprise Resource Planning\n\nKey Activities:\n\u2022 Implementation and configuration\n\u2022 Data integration and management\n\u2022 Process optimization\n\nRelated Modules:\n\u2022 Financial Management\n\u2022 Human Capital Management\n\u2022 Supply Chain Management\n\nQuick Difference (if comparing concepts):\nERP is a comprehensive software solution that integrates various business functions, whereas CRM (Customer Relationship Management) focuses on customer interactions and relationships.",
+          "business_insights": [],
+          "recommendations": []
+        }
+      }
+    ],
+    [
+      "General",
+      {
+        "question": "What is the difference between ERP and CRM?",
+        "status_code": 200,
+        "elapsed_seconds": 8.2,
+        "response": {
+          "summary": "I'm EDIP AI, your ERP Business Assistant.\n\nWhat is the difference between ERP and CRM?\n\n\ud83d\udcd8 Definition: Enterprise Resource Planning (ERP) vs Customer Relationship Management (CRM)\n\nKey Activities:\n\u2022 Understanding system functionalities\n\u2022 Analyzing business processes\n\u2022 Identifying software features\n\nRelated Modules:\n\u2022 Financial Management\n\u2022 Human Resources\n\u2022 Supply Chain Management\n\nQuick Difference:\nERP focuses on integrating all aspects of an organization's operations, while CRM concentrates on managing customer interactions and relationships.\n\nPlease let me know if you'd like to explore further or ask a new question!",
+          "data": [],
+          "chart_type": "text",
+          "executive_summary": "I'm EDIP AI, your ERP Business Assistant.\n\nWhat is the difference between ERP and CRM?\n\n\ud83d\udcd8 Definition: Enterprise Resource Planning (ERP) vs Customer Relationship Management (CRM)\n\nKey Activities:\n\u2022 Understanding system functionalities\n\u2022 Analyzing business processes\n\u2022 Identifying software features\n\nRelated Modules:\n\u2022 Financial Management\n\u2022 Human Resources\n\u2022 Supply Chain Management\n\nQuick Difference:\nERP focuses on integrating all aspects of an organization's operations, while CRM concentrates on managing customer interactions and relationships.\n\nPlease let me know if you'd like to explore further or ask a new question!",
+          "business_insights": [],
+          "recommendations": []
+        }
+      }
+    ],
+    [
+      "General",
+      {
+        "question": "What is a Purchase Requisition (PR)?",
+        "status_code": 200,
+        "elapsed_seconds": 7.8,
+        "response": {
+          "summary": "I'm EDIP AI, your ERP Business Assistant.\n\nWhat is a Purchase Requisition (PR)?\n\n\ud83d\udcd8 Definition\nA Purchase Requisition (PR) is a formal request from an employee or department to purchase goods or services for the organization.\n\nKey Activities:\n\u2022 Initiate PR\n\u2022 Approve PR\n\u2022 Process Payment\n\nRelated Modules:\n\u2022 Procurement Module\n\u2022 Accounts Payable Module\n\nQuick Difference: A PR is similar to a Purchase Order, but it's a preliminary request that needs approval before the actual order is placed.",
+          "data": [],
+          "chart_type": "text",
+          "executive_summary": "I'm EDIP AI, your ERP Business Assistant.\n\nWhat is a Purchase Requisition (PR)?\n\n\ud83d\udcd8 Definition\nA Purchase Requisition (PR) is a formal request from an employee or department to purchase goods or services for the organization.\n\nKey Activities:\n\u2022 Initiate PR\n\u2022 Approve PR\n\u2022 Process Payment\n\nRelated Modules:\n\u2022 Procurement Module\n\u2022 Accounts Payable Module\n\nQuick Difference: A PR is similar to a Purchase Order, but it's a preliminary request that needs approval before the actual order is placed.",
+          "business_insights": [],
+          "recommendations": []
+        }
+      }
+    ],
+    [
+      "General",
+      {
+        "question": "What is a Purchase Order (PO)?",
+        "status_code": 200,
+        "elapsed_seconds": 8.11,
+        "response": {
+          "summary": "I'm EDIP AI, your ERP Business Assistant.\n\nWhat is a Purchase Order (PO)?\n\n\ud83d\udcd8 Definition\nA Purchase Order (PO) is an official document sent by a buyer to a supplier requesting goods or services in exchange for payment.\n\nKey Activities:\n\u2022 Issuance of PO\n\u2022 Receiving and processing POs\n\u2022 Tracking and managing PO status\n\nRelated Modules:\n\u2022 Procurement Module\n\u2022 Inventory Management Module\n\nQuick Difference: A Purchase Order is similar to an Invoice, but it's used by the buyer to request goods or services from a supplier.",
+          "data": [],
+          "chart_type": "text",
+          "executive_summary": "I'm EDIP AI, your ERP Business Assistant.\n\nWhat is a Purchase Order (PO)?\n\n\ud83d\udcd8 Definition\nA Purchase Order (PO) is an official document sent by a buyer to a supplier requesting goods or services in exchange for payment.\n\nKey Activities:\n\u2022 Issuance of PO\n\u2022 Receiving and processing POs\n\u2022 Tracking and managing PO status\n\nRelated Modules:\n\u2022 Procurement Module\n\u2022 Inventory Management Module\n\nQuick Difference: A Purchase Order is similar to an Invoice, but it's used by the buyer to request goods or services from a supplier.",
+          "business_insights": [],
+          "recommendations": []
+        }
+      }
+    ],
+    [
+      "Company Data",
+      {
+        "question": "how many sales orders are in the system?",
+        "status_code": 200,
+        "elapsed_seconds": 13.69,
+        "response": {
+          "sql": "SELECT COUNT(T1.id) AS total_sales_orders FROM Sales_Masters.SalesOrder_Header AS T1",
+          "chart_type": "card",
+          "data": [
+            {
+              "total_sales_orders": 91
+            }
+          ]
+        }
+      }
+    ],
+    [
+      "Company Data",
+      {
+        "question": "show all customers",
+        "status_code": 200,
+        "elapsed_seconds": 15.25,
+        "response": {
+          "sql": "SELECT T1.id, T1.name, T1.email, T1.phone FROM masters.customers AS T1",
+          "chart_type": "table",
+          "data": [
+            {
+              "id": "TN-1",
+              "name": "ACE FIRE ENGINEERING PTE LTD",
+              "email": "contact@acefire.com",
+              "phone": "6543210910"
+            },
+            {
+              "id": "TN-2",
+              "name": "AIR LIQUIDE SINGAPORE PTE LTD",
+              "email": "Martius@btg.com",
+              "phone": "5555555555"
+            },
+            {
+              "id": "TN-3",
+              "name": "AKHUN SERVICE",
+              "email": "support@akhun.com",
+              "phone": "8812345690"
+            },
+            {
+              "id": "TN001",
+              "name": "test",
+              "email": "test@gmail.com",
+              "phone": "9876543210"
+            }
+          ]
+        }
+      }
+    ],
+    [
+      "Company Data",
+      {
+        "question": "show all suppliers",
+        "status_code": 200,
+        "elapsed_seconds": 14.74,
+        "response": {
+          "sql": "SELECT T1.id, T1.name, T1.email, T1.phone FROM masters.suppliers AS T1",
+          "chart_type": "table",
+          "data": [
+            {
+              "id": "SUPP-1",
+              "name": "Global Steel Industries",
+              "email": "sales@globalsteel.com",
+              "phone": "65112233"
+            },
+            {
+              "id": "SUPP-2",
+              "name": "Nippon Machinery Corp",
+              "email": "exports@nipponmach.jp",
+              "phone": "8133555666"
+            }
+          ]
+        }
+      }
+    ],
+    [
+      "Company Data",
+      {
+        "question": "how many items are active in the system?",
+        "status_code": 200,
+        "elapsed_seconds": 13.72,
+        "response": {
+          "sql": "SELECT COUNT(*) FROM masters.items WHERE active = 1;",
+          "chart_type": "card",
+          "summary": "",
+          "data": [
+            {
+              "COUNT(*)": 11
+            }
+          ]
+        }
+      }
+    ],
+    [
+      "Company Data",
+      {
+        "question": "what is the highest value invoice?",
+        "status_code": 200,
+        "elapsed_seconds": 13.6,
+        "response": {
+          "sql": "SELECT T1.invoice_id, T1.customer_name, T1.total FROM Sales_Masters.Invoice_Header AS T1 ORDER BY T1.total DESC LIMIT 10",
+          "chart_type": "table",
+          "data": [
+            {
+              "invoice_id": "INV-202604-109",
+              "customer_name": "Alpha Corp",
+              "total": 32370.35
+            },
+            {
+              "invoice_id": "INV-202604-129",
+              "customer_name": "Beta LLC",
+              "total": 29795
+            },
+            {
+              "invoice_id": "INV-202605-178",
+              "customer_name": "Gamma Logistics",
+              "total": 26927.6
+            },
+            {
+              "invoice_id": "INV-202604-102",
+              "customer_name": "Beta LLC",
+              "total": 24862.6
+            },
+            {
+              "invoice_id": "INV-202604-113",
+              "customer_name": "Beta LLC",
+              "total": 24201.8
+            },
+            {
+              "invoice_id": "INV-202604-142",
+              "customer_name": "Beta LLC",
+              "total": 23181.1
+            },
+            {
+              "invoice_id": "INV-202605-149",
+              "customer_name": "Delta Tech",
+              "total": 22626.5
+            },
+            {
+              "invoice_id": "INV-202604-141",
+              "customer_name": "Delta Tech",
+              "total": 21051.2
+            },
+            {
+              "invoice_id": "INV-202605-150",
+              "customer_name": "Gamma Logistics",
+              "total": 20664.75
+            },
+            {
+              "invoice_id": "INV-202605-160",
+              "customer_name": "Beta LLC",
+              "total": 20650
+            }
+          ]
+        }
+      }
+    ]
+  ]
+}

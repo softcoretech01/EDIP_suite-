@@ -1,0 +1,3446 @@
+[
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "grn_Details",
+    "full_table_name": "Purchase_Masters.grn_Details",
+    "business_purpose": "Line items for each GRN — item received, quantity, batch, expiry.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "grn_item_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "grn_item_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Grn Item reference ID",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "grn_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Goods Receipt Note ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "item_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Item/Product ID (Foreign Key to masters.items)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "po_qty",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Quantity ordered in the original PO",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "received_qty",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Quantity of items actually received",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "batch_lot_number",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Manufacturing batch/lot number of received goods",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "mfg_date",
+        "data_type": "DATE",
+        "business_meaning": "Manufacturing date of received goods",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "expiry_date",
+        "data_type": "DATE",
+        "business_meaning": "Expiry date of received goods",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all grn details records",
+      "Count total grn details this month"
+    ],
+    "generated_at": "2026-06-12T14:58:07.708623"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "grn_Header",
+    "full_table_name": "Purchase_Masters.grn_Header",
+    "business_purpose": "Stores Goods Receipt Note (GRN) headers — records of goods physically received from suppliers.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "grn_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "grn_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Goods Receipt Note ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "grn_number",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "GRN Reference Number (e.g. GRN-001)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "po_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Unique Purchase Order ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "supplier_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Supplier/Vendor ID (Foreign Key to masters.suppliers)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "grn_date",
+        "data_type": "DATE",
+        "business_meaning": "Date goods were physically received",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updated_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was last updated",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "How many GRNs were received this month?",
+      "Which GRNs are pending this week?",
+      "List all goods receipts for a specific supplier"
+    ],
+    "generated_at": "2026-06-12T14:58:07.778380"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "import_landed_costs_Details",
+    "full_table_name": "Purchase_Masters.import_landed_costs_Details",
+    "business_purpose": "Per-item cost allocation of import landed costs — allocated overhead, landed unit cost.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "detail_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "detail_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Detail line item ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "import_landed_cost_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Import Landed Cost ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "item_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Item/Product ID (Foreign Key to masters.items)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "qty",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Quantity",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "fob_val_lcy",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Free-On-Board value in Local Currency",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "allocated_overhead",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Overhead amount allocated to this specific item",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "total_landed_cost",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total landed cost including all charges (duty, freight, insurance)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "landed_unit_cost",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Cost per unit after allocating all landed costs",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all import landed costs details records",
+      "Count total import landed costs details this month"
+    ],
+    "generated_at": "2026-06-12T14:58:07.878644"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "import_landed_costs_Header",
+    "full_table_name": "Purchase_Masters.import_landed_costs_Header",
+    "business_purpose": "Stores import landed cost details — customs duty, freight, insurance per import PO.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "import_landed_cost_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "import_landed_cost_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Import Landed Cost ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "import_po_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Import Purchase Order ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "duty_percent",
+        "data_type": "DECIMAL(5, 2)",
+        "business_meaning": "Customs duty percentage applied to import",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "cess_percent",
+        "data_type": "DECIMAL(5, 2)",
+        "business_meaning": "CESS surcharge percentage on customs duty",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "gst_percent",
+        "data_type": "DECIMAL(5, 2)",
+        "business_meaning": "GST percentage applicable",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "include_gst",
+        "data_type": "TINYINT",
+        "business_meaning": "1 = Include GST in landed cost calculation, 0 = Exclude",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "sea_freight",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Sea freight charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "road_freight",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Road/land freight charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "local_transport",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Local transport/delivery charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "liner_charges",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Port liner/terminal handling charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "insurance_cost",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Insurance charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "handling_charges",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Handling/loading charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "packing_charges",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Packing charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "aging_charges",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Aging/storage charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "total_customs_duty",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total customs duty paid",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "total_freight",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total freight charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "total_port_charges",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total port and terminal charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "total_overhead",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total overhead/additional charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "total_landed_cost",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total landed cost including all charges (duty, freight, insurance)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updated_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was last updated",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "is_posted",
+        "data_type": "TINYINT",
+        "business_meaning": "1 = Landed cost is finalized/posted, 0 = Draft",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "What is our total import landed cost this year?",
+      "What is the total customs duty paid?",
+      "What is total freight cost on imports?"
+    ],
+    "generated_at": "2026-06-12T14:58:07.918411"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "import_purchase_orders_Details",
+    "full_table_name": "Purchase_Masters.import_purchase_orders_Details",
+    "business_purpose": "Line items for Import Purchase Orders — item, foreign currency qty and price.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "detail_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "detail_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Detail line item ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "import_po_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Import Purchase Order ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "item_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Item/Product ID (Foreign Key to masters.items)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "currency_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Foreign currency ID used for this import PO",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "qty",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Quantity",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "fcy_unit_price",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Unit price in Foreign Currency",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "total_fcy",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total value in Foreign Currency (FCY)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all import purchase orders details records",
+      "Count total import purchase orders details this month"
+    ],
+    "generated_at": "2026-06-12T14:58:07.955854"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "import_purchase_orders_Header",
+    "full_table_name": "Purchase_Masters.import_purchase_orders_Header",
+    "business_purpose": "Stores IMPORT Purchase Order headers — foreign supplier, currency, exchange rate.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "import_po_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "import_po_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Import Purchase Order ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "import_po_number",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Import PO Reference Number (e.g. IPO-2026-001)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "supplier_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Supplier/Vendor ID (Foreign Key to masters.suppliers)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "po_date",
+        "data_type": "DATE",
+        "business_meaning": "Date the Purchase Order was issued",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "currency_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Foreign currency ID used for this import PO",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "exchange_rate",
+        "data_type": "DECIMAL(10, 4)",
+        "business_meaning": "Exchange rate at time of PO (Foreign currency to LCY)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "payment_terms",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Agreed payment terms with supplier (e.g. Net 30, Cash)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "total_fcy",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total value in Foreign Currency (FCY)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "total_lcy",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total value in Local Currency (LCY/INR)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "status",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Current status of the record (e.g. Ordered, Received, Cancelled)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updated_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was last updated",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "How many import purchase orders are there this month?",
+      "What is the total import spend in LCY this year?",
+      "List all import POs with status and value"
+    ],
+    "generated_at": "2026-06-12T14:58:07.990067"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "inventory_batches",
+    "full_table_name": "Purchase_Masters.inventory_batches",
+    "business_purpose": "Tracks current inventory batch stock levels — item, current qty, landed cost, selling price.",
+    "erp_module": "Inventory",
+    "primary_key": [
+      "batch_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "batch_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Inventory Batch ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "batch_no",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Batch reference number",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "item_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Item/Product ID (Foreign Key to masters.items)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "current_qty",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Current available stock quantity",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "mfg_date",
+        "data_type": "DATE",
+        "business_meaning": "Manufacturing date of received goods",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "expiry_date",
+        "data_type": "DATE",
+        "business_meaning": "Expiry date of received goods",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "landed_unit_cost",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Cost per unit after allocating all landed costs",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "final_selling_price",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Final selling price per unit",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "margin_percent",
+        "data_type": "DECIMAL(5, 2)",
+        "business_meaning": "Profit margin percentage",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "status",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Current status of the record (e.g. Ordered, Received, Cancelled)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "source_type",
+        "data_type": "ENUM",
+        "business_meaning": "Source of inventory (Local Purchase, Import, etc.)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "po_reference",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Po Reference",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "grn_reference",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Grn Reference",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "IPO_reference",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Ipo Reference",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updated_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was last updated",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "is_posted",
+        "data_type": "INTEGER",
+        "business_meaning": "1 = Landed cost is finalized/posted, 0 = Draft",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "inward_qty",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total quantity received (inward)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "outward_qty",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total quantity issued/sold (outward)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "damaged_qty",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Quantity damaged or written off",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "damage_remarks",
+        "data_type": "VARCHAR(255)",
+        "business_meaning": "Damage Remarks",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "What is the current stock value of all items?",
+      "Which items have zero stock?",
+      "Which items are running low on stock?",
+      "What is the total inventory worth?"
+    ],
+    "generated_at": "2026-06-12T14:58:08.277319"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "local_landed_cost_Details",
+    "full_table_name": "Purchase_Masters.local_landed_cost_Details",
+    "business_purpose": "Per-item cost allocation of local landed costs — unit price, allocated overhead.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "landed_cost_item_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "landed_cost_item_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Landed Cost line item ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "landed_cost_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Local Landed Cost ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "item_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Item/Product ID (Foreign Key to masters.items)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "qty",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Quantity",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "unit_price",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Price per unit",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "val_lcy",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Value in Local Currency",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "allocated_overhead",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Overhead amount allocated to this specific item",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "total_landed_cost",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total landed cost including all charges (duty, freight, insurance)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "landed_unit_cost",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Cost per unit after allocating all landed costs",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all local landed cost details records",
+      "Count total local landed cost details this month"
+    ],
+    "generated_at": "2026-06-12T14:58:08.373407"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "local_landed_cost_Header",
+    "full_table_name": "Purchase_Masters.local_landed_cost_Header",
+    "business_purpose": "Stores local landed cost details — insurance, handling, freight charges per GRN.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "landed_cost_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "landed_cost_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Local Landed Cost ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "grn_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Goods Receipt Note ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "insurance_charges",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Insurance Charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "handling_charges",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Handling/loading charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "packing_charges",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Packing charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "aging_charges",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Aging/storage charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "total_lcy",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total value in Local Currency (LCY/INR)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "total_overhead",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total overhead/additional charges",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "total_landed_cost",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total landed cost including all charges (duty, freight, insurance)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updated_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was last updated",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "is_posted",
+        "data_type": "TINYINT",
+        "business_meaning": "1 = Landed cost is finalized/posted, 0 = Draft",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all local landed cost header records",
+      "Count total local landed cost header this month"
+    ],
+    "generated_at": "2026-06-12T14:58:08.406604"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "purchase_order_Details",
+    "full_table_name": "Purchase_Masters.purchase_order_Details",
+    "business_purpose": "Stores line items for local Purchase Orders — item, qty, price per PO.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "po_item_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "po_item_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Purchase Order line item ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "po_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Unique Purchase Order ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "item_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Item/Product ID (Foreign Key to masters.items)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "quantity",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Quantity",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "uom",
+        "data_type": "VARCHAR(20)",
+        "business_meaning": "Uom",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "unit_price",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Price per unit",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "tax_rate",
+        "data_type": "DECIMAL(5, 2)",
+        "business_meaning": "Tax rate percentage applied to line item",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "line_total",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total value of this line item (qty × unit_price)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "What items are in PO-001?",
+      "Which items are most frequently purchased locally?",
+      "What is the total ordered quantity per item this month?"
+    ],
+    "generated_at": "2026-06-12T14:58:08.455519"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "purchase_order_delivery_schedules",
+    "full_table_name": "Purchase_Masters.purchase_order_delivery_schedules",
+    "business_purpose": "Tracks expected delivery dates and quantities for each local PO.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "schedule_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "schedule_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Delivery schedule ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "po_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Unique Purchase Order ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "expected_delivery_date",
+        "data_type": "DATE",
+        "business_meaning": "Expected date for PO delivery",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "target_quantity",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Target quantity for the scheduled delivery",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all purchase order delivery schedules records",
+      "Count total purchase order delivery schedules this month"
+    ],
+    "generated_at": "2026-06-12T14:58:08.483069"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "purchase_orders_Header",
+    "full_table_name": "Purchase_Masters.purchase_orders_Header",
+    "business_purpose": "Stores LOCAL Purchase Order headers — supplier, date, totals. One row per PO.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "po_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "po_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Unique Purchase Order ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "po_number",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Purchase Order Reference Number (e.g. PO-001)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "pr_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Purchase Requisition ID (Foreign Key to purchase_requisitions_Header)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "supplier_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Supplier/Vendor ID (Foreign Key to masters.suppliers)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "po_date",
+        "data_type": "DATE",
+        "business_meaning": "Date the Purchase Order was issued",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "payment_terms",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Agreed payment terms with supplier (e.g. Net 30, Cash)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "sub_total",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "PO value before taxes",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "tax_total",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total tax amount on the PO",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "grand_total",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total PO value including taxes",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updated_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was last updated",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "How many local purchase orders were made this month?",
+      "What is our total local purchase spend this year?",
+      "List all purchase orders with their supplier and total value"
+    ],
+    "generated_at": "2026-06-12T14:58:08.527683"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "purchase_requisition_Details",
+    "full_table_name": "Purchase_Masters.purchase_requisition_Details",
+    "business_purpose": "Line items for each Purchase Requisition — item, qty, unit price.",
+    "erp_module": "Procurement",
+    "primary_key": [],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "pr_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Purchase Requisition ID (Foreign Key to purchase_requisitions_Header)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "item_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Item/Product ID (Foreign Key to masters.items)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "requested_quantity",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Quantity requested in the requisition",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "uom",
+        "data_type": "VARCHAR(20)",
+        "business_meaning": "Uom",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "reason_for_request",
+        "data_type": "TEXT",
+        "business_meaning": "Business reason for the purchase request",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "TIMESTAMP",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "unit_price",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Price per unit",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "total_price",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Monetary value — total price",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all purchase requisition details records",
+      "Count total purchase requisition details this month"
+    ],
+    "generated_at": "2026-06-12T14:58:08.574188"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "purchase_requisitions_Header",
+    "full_table_name": "Purchase_Masters.purchase_requisitions_Header",
+    "business_purpose": "Stores Purchase Requisition (PR) headers — department requests for goods/services.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "pr_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "pr_id",
+        "data_type": "BIGINT",
+        "business_meaning": "Purchase Requisition ID (Foreign Key to purchase_requisitions_Header)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "pr_number",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Purchase Requisition Reference Number",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "pr_date",
+        "data_type": "DATE",
+        "business_meaning": "Date the requisition was raised",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "required_by_date",
+        "data_type": "DATE",
+        "business_meaning": "Date by which items are needed",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "department",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Department that raised the requisition",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "requested_by",
+        "data_type": "INTEGER",
+        "business_meaning": "Employee who requested the items",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "notes",
+        "data_type": "TEXT",
+        "business_meaning": "Notes",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "TIMESTAMP",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updated_at",
+        "data_type": "TIMESTAMP",
+        "business_meaning": "Timestamp when record was last updated",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "priority",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Priority level of the requisition (High/Medium/Low)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "How many purchase requisitions are open this month?",
+      "Which purchase requisitions are not converted to PO?",
+      "List PRs by department"
+    ],
+    "generated_at": "2026-06-12T14:58:08.624536"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "purchase_return_Details",
+    "full_table_name": "Purchase_Masters.purchase_return_Details",
+    "business_purpose": "Line items for Purchase Returns — returned item, qty, reason.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "return_item_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "return_item_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Return line item ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "return_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Purchase Return ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "item_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Item/Product ID (Foreign Key to masters.items)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "inwarded_qty",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Quantity that was originally received (inward qty)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "return_qty",
+        "data_type": "DECIMAL(15, 4)",
+        "business_meaning": "Quantity returned to supplier",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "return_reason",
+        "data_type": "VARCHAR(255)",
+        "business_meaning": "Reason for returning goods to supplier",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all purchase return details records",
+      "Count total purchase return details this month"
+    ],
+    "generated_at": "2026-06-12T14:58:08.653869"
+  },
+  {
+    "schema_name": "Purchase_Masters",
+    "table_name": "purchase_return_Header",
+    "full_table_name": "Purchase_Masters.purchase_return_Header",
+    "business_purpose": "Stores Purchase Return headers — items returned to suppliers with debit note status.",
+    "erp_module": "Procurement",
+    "primary_key": [
+      "return_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "return_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Purchase Return ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "return_number",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Return Reference Number",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "grn_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Goods Receipt Note ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "supplier_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Supplier/Vendor ID (Foreign Key to masters.suppliers)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "return_date",
+        "data_type": "DATE",
+        "business_meaning": "Date goods were returned to supplier",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "debit_note_status",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Status of debit note raised against supplier (Pending/Approved)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "refund_total",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total refund amount from supplier",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updated_at",
+        "data_type": "DATETIME",
+        "business_meaning": "Timestamp when record was last updated",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "How many purchase returns were made this month?",
+      "What is the total refund value from supplier returns?",
+      "List all pending debit notes"
+    ],
+    "generated_at": "2026-06-12T14:58:08.684996"
+  },
+  {
+    "schema_name": "Sales_Masters",
+    "table_name": "Invoice_Details",
+    "full_table_name": "Sales_Masters.Invoice_Details",
+    "business_purpose": "Line items for Sales Invoices — item, qty, unit price.",
+    "erp_module": "Finance / Sales",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "invoice_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Sales Invoice ID (Primary Key)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "item_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Item/Product ID (Foreign Key to masters.items)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(150)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "ordered_qty",
+        "data_type": "DECIMAL(10, 2)",
+        "business_meaning": "Quantity ordered by customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "supplied_qty",
+        "data_type": "DECIMAL(10, 2)",
+        "business_meaning": "Quantity already supplied/delivered",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "pending_qty",
+        "data_type": "DECIMAL(10, 2)",
+        "business_meaning": "Quantity yet to be supplied (ordered - supplied)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "unit_price",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Price per unit",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      }
+    ],
+    "example_queries": [
+      "List all invoice details records",
+      "Count total invoice details this month"
+    ],
+    "generated_at": "2026-06-12T14:58:08.842937"
+  },
+  {
+    "schema_name": "Sales_Masters",
+    "table_name": "Invoice_Header",
+    "full_table_name": "Sales_Masters.Invoice_Header",
+    "business_purpose": "Stores Sales Invoice headers — customer, amount, tax, total value.",
+    "erp_module": "Finance / Sales",
+    "primary_key": [
+      "invoice_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "invoice_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Sales Invoice ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "so_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Sales Order ID (Foreign Key to SalesOrder_Header)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "cpo_ref",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Customer Purchase Order Reference number",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "customer_name",
+        "data_type": "VARCHAR(150)",
+        "business_meaning": "Customer name on the sales order",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "amount",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Invoice amount before tax",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "tax_amount",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Tax amount on invoice",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "tax_type",
+        "data_type": "VARCHAR(10)",
+        "business_meaning": "Type of tax applied (e.g. GST, VAT)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "total",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Total invoice value (amount + tax) — USE THIS for invoice amounts",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "TIMESTAMP",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updated_at",
+        "data_type": "TIMESTAMP",
+        "business_meaning": "Timestamp when record was last updated",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "What is our total revenue this month?",
+      "Who are our top 10 customers by revenue?",
+      "What is the highest value invoice this month?",
+      "What is the total invoiced amount this year?"
+    ],
+    "generated_at": "2026-06-12T14:58:08.884407"
+  },
+  {
+    "schema_name": "Sales_Masters",
+    "table_name": "SalesOrder_Details",
+    "full_table_name": "Sales_Masters.SalesOrder_Details",
+    "business_purpose": "Line items for Sales Orders — item, ordered qty, supplied qty, pending qty.",
+    "erp_module": "Sales",
+    "primary_key": [
+      "so_details_id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "so_details_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Sales Order detail line item ID (Primary Key)",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "So_number",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Sales Order Reference Number (e.g. SO-001)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "item_id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Item/Product ID (Foreign Key to masters.items)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(150)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "ordered_qty",
+        "data_type": "DECIMAL(10, 2)",
+        "business_meaning": "Quantity ordered by customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "supplied_qty",
+        "data_type": "DECIMAL(10, 2)",
+        "business_meaning": "Quantity already supplied/delivered",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "pending_qty",
+        "data_type": "DECIMAL(10, 2)",
+        "business_meaning": "Quantity yet to be supplied (ordered - supplied)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "unit_price",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Price per unit",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      }
+    ],
+    "example_queries": [
+      "List all salesorder details records",
+      "Count total salesorder details this month"
+    ],
+    "generated_at": "2026-06-12T14:58:08.960251"
+  },
+  {
+    "schema_name": "Sales_Masters",
+    "table_name": "SalesOrder_Header",
+    "full_table_name": "Sales_Masters.SalesOrder_Header",
+    "business_purpose": "Stores Sales Order (SO) headers — customer, date, delivery schedule.",
+    "erp_module": "Sales",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "So_number",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Sales Order Reference Number (e.g. SO-001)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "customer_name",
+        "data_type": "VARCHAR(150)",
+        "business_meaning": "Customer name on the sales order",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "date",
+        "data_type": "DATE",
+        "business_meaning": "Sales Order date",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "delivery_schedule",
+        "data_type": "DATE",
+        "business_meaning": "Scheduled delivery date for the order",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "invoice_generated",
+        "data_type": "TINYINT",
+        "business_meaning": "1 = Invoice has been generated, 0 = Pending invoice",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "created_at",
+        "data_type": "TIMESTAMP",
+        "business_meaning": "Timestamp when record was created",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updated_at",
+        "data_type": "TIMESTAMP",
+        "business_meaning": "Timestamp when record was last updated",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "How many sales orders were created this month?",
+      "How many sales orders are pending delivery?",
+      "What is our total sales order value this quarter?"
+    ],
+    "generated_at": "2026-06-12T14:58:09.002972"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "currencies",
+    "full_table_name": "masters.currencies",
+    "business_purpose": "Stores currencies records.",
+    "erp_module": "General",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "code",
+        "data_type": "VARCHAR(10)",
+        "business_meaning": "Code",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all currencies records",
+      "Count total currencies this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.154458"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "customer_types",
+    "full_table_name": "masters.customer_types",
+    "business_purpose": "Stores customer types records.",
+    "erp_module": "Customer",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "label",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Label",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all customer types records",
+      "Count total customer types this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.194596"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "customers",
+    "full_table_name": "masters.customers",
+    "business_purpose": "Master list of all customers/clients — name, contact, credit limit, payment terms.",
+    "erp_module": "Customer",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(255)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "email",
+        "data_type": "VARCHAR(255)",
+        "business_meaning": "Email",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "phone",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Phone",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "customer_type_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Customer Type reference ID",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "active",
+        "data_type": "TINYINT",
+        "business_meaning": "1 = Active record, 0 = Inactive/disabled",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "billingAddress",
+        "data_type": "LONGTEXT",
+        "business_meaning": "Billingaddress",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "shippingAddress",
+        "data_type": "LONGTEXT",
+        "business_meaning": "Shippingaddress",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "gstDetails",
+        "data_type": "LONGTEXT",
+        "business_meaning": "Gstdetails",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "creditLimit",
+        "data_type": "DECIMAL(12, 2)",
+        "business_meaning": "Maximum credit amount allowed for the customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "payment_term_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Payment Term reference ID",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "price_category_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Price Category reference ID",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "contactPersons",
+        "data_type": "LONGTEXT",
+        "business_meaning": "Contactpersons",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "sales_person_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Sales Person reference ID",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all customers records",
+      "Count total customers this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.230732"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "documents",
+    "full_table_name": "masters.documents",
+    "business_purpose": "Stores documents records.",
+    "erp_module": "General",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(255)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "category",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Category",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "uploaded_by",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Uploaded By",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "upload_date",
+        "data_type": "DATE",
+        "business_meaning": "Date field for upload",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "size",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Size specification of the item",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "version",
+        "data_type": "INTEGER",
+        "business_meaning": "Version",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "linked_transaction",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Linked Transaction",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "file_path",
+        "data_type": "VARCHAR(500)",
+        "business_meaning": "File Path",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "history",
+        "data_type": "LONGTEXT",
+        "business_meaning": "History",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all documents records",
+      "Count total documents this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.258699"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "gst_rates",
+    "full_table_name": "masters.gst_rates",
+    "business_purpose": "Stores gst rates records.",
+    "erp_module": "General",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "rate",
+        "data_type": "INTEGER",
+        "business_meaning": "Rate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all gst rates records",
+      "Count total gst rates this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.294852"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "item_categories",
+    "full_table_name": "masters.item_categories",
+    "business_purpose": "Stores item categories records.",
+    "erp_module": "Inventory",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "groupId",
+        "data_type": "INTEGER",
+        "business_meaning": "Groupid",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all item categories records",
+      "Count total item categories this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.349529"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "item_groups",
+    "full_table_name": "masters.item_groups",
+    "business_purpose": "Stores item groups records.",
+    "erp_module": "Inventory",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all item groups records",
+      "Count total item groups this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.371176"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "items",
+    "full_table_name": "masters.items",
+    "business_purpose": "Master catalog of all inventory items — name, category, brand, UOM, min stock, reorder level, standard price.",
+    "erp_module": "Inventory",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "group_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Item group/family classification",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "category_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Item category classification",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "brand",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Brand name of the item",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "model",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Model number of the item",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "size",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Size specification of the item",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "color",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Color of the item",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "uom_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Unit of Measure ID (e.g. KG, Piece, Liter)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "hsnCode",
+        "data_type": "INTEGER",
+        "business_meaning": "HSN (Harmonized System Nomenclature) code for tax purposes",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "gst_percent_id",
+        "data_type": "INTEGER",
+        "business_meaning": "Gst Percent reference ID",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "minStock",
+        "data_type": "INTEGER",
+        "business_meaning": "Minimum stock level — alert if stock falls below this",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "reorderLevel",
+        "data_type": "INTEGER",
+        "business_meaning": "Reorder point — trigger purchase when stock reaches this level",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "batchApplicable",
+        "data_type": "BIT",
+        "business_meaning": "Batchapplicable",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "serialApplicable",
+        "data_type": "BIT",
+        "business_meaning": "Serialapplicable",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "isImported",
+        "data_type": "BIT",
+        "business_meaning": "1 = Item is imported, 0 = Locally sourced",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "active",
+        "data_type": "BIT",
+        "business_meaning": "1 = Active record, 0 = Inactive/disabled",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "standardPrice",
+        "data_type": "DECIMAL(10, 2)",
+        "business_meaning": "Standard selling price of the item",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "buildersPrice",
+        "data_type": "DECIMAL(10, 2)",
+        "business_meaning": "Buildersprice",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "dealersPrice",
+        "data_type": "DECIMAL(10, 2)",
+        "business_meaning": "Dealersprice",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "contractorsPrice",
+        "data_type": "DECIMAL(10, 2)",
+        "business_meaning": "Contractorsprice",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "houseOwnersPrice",
+        "data_type": "DECIMAL(10, 2)",
+        "business_meaning": "Houseownersprice",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "image",
+        "data_type": "VARCHAR(255)",
+        "business_meaning": "Image",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "Which items have exceeded their reorder level?",
+      "List all imported items",
+      "What items are in the low stock alert?"
+    ],
+    "generated_at": "2026-06-12T14:58:09.399602"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "payment_terms",
+    "full_table_name": "masters.payment_terms",
+    "business_purpose": "Stores payment terms records.",
+    "erp_module": "Finance",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "label",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Label",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all payment terms records",
+      "Count total payment terms this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.425033"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "price_categories",
+    "full_table_name": "masters.price_categories",
+    "business_purpose": "Stores price categories records.",
+    "erp_module": "General",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "label",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Label",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all price categories records",
+      "Count total price categories this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.499507"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "role_permissions",
+    "full_table_name": "masters.role_permissions",
+    "business_purpose": "Stores role permissions records.",
+    "erp_module": "General",
+    "primary_key": [
+      "role_name"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "role_name",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Role Name",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "permissions",
+        "data_type": "LONGTEXT",
+        "business_meaning": "Permissions",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all role permissions records",
+      "Count total role permissions this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.525877"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "supplier_types",
+    "full_table_name": "masters.supplier_types",
+    "business_purpose": "Stores supplier types records.",
+    "erp_module": "Supplier",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "label",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Label",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all supplier types records",
+      "Count total supplier types this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.562556"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "suppliers",
+    "full_table_name": "masters.suppliers",
+    "business_purpose": "Master list of all suppliers/vendors — name, contact, type, payment terms, currency.",
+    "erp_module": "Supplier",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(255)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "email",
+        "data_type": "VARCHAR(255)",
+        "business_meaning": "Email",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "phone",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Phone",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "type",
+        "data_type": "INTEGER",
+        "business_meaning": "Type",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "currency",
+        "data_type": "INTEGER",
+        "business_meaning": "Currency",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "leadTime",
+        "data_type": "INTEGER",
+        "business_meaning": "Supplier lead time in days",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "active",
+        "data_type": "TINYINT",
+        "business_meaning": "1 = Active record, 0 = Inactive/disabled",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "taxDetails",
+        "data_type": "LONGTEXT",
+        "business_meaning": "Taxdetails",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "paymentTerms",
+        "data_type": "INTEGER",
+        "business_meaning": "Paymentterms",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "importDetails",
+        "data_type": "LONGTEXT",
+        "business_meaning": "Importdetails",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "Which supplier do we buy from the most?",
+      "List all active suppliers",
+      "Which supplier has the highest total purchase value?"
+    ],
+    "generated_at": "2026-06-12T14:58:09.605925"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "tax_registration_types",
+    "full_table_name": "masters.tax_registration_types",
+    "business_purpose": "Stores tax registration types records.",
+    "erp_module": "Finance",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "label",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Label",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all tax registration types records",
+      "Count total tax registration types this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.664299"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "uoms",
+    "full_table_name": "masters.uoms",
+    "business_purpose": "Stores uoms records.",
+    "erp_module": "Masters",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "updatedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Updatedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "updatedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Updateddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedDate",
+        "data_type": "DATETIME",
+        "business_meaning": "Modifieddate",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "modifiedBy",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Modifiedby",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all uoms records",
+      "Count total uoms this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.720324"
+  },
+  {
+    "schema_name": "masters",
+    "table_name": "users",
+    "full_table_name": "masters.users",
+    "business_purpose": "Stores users records.",
+    "erp_module": "General",
+    "primary_key": [
+      "id"
+    ],
+    "foreign_keys": [],
+    "columns": [
+      {
+        "column_name": "id",
+        "data_type": "INTEGER",
+        "business_meaning": "Id",
+        "is_primary_key": true,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "name",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Name of the item/supplier/customer",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "role",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Role",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "email",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Email",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": false
+      },
+      {
+        "column_name": "department",
+        "data_type": "VARCHAR(100)",
+        "business_meaning": "Department that raised the requisition",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "status",
+        "data_type": "VARCHAR(50)",
+        "business_meaning": "Current status of the record (e.g. Ordered, Received, Cancelled)",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      },
+      {
+        "column_name": "monthly_target",
+        "data_type": "DECIMAL(15, 2)",
+        "business_meaning": "Monthly Target",
+        "is_primary_key": false,
+        "is_foreign_key": false,
+        "nullable": true
+      }
+    ],
+    "example_queries": [
+      "List all users records",
+      "Count total users this month"
+    ],
+    "generated_at": "2026-06-12T14:58:09.768502"
+  }
+]

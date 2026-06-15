@@ -1,0 +1,163 @@
+[
+  {
+    "q": "What is our total revenue this month",
+    "status": "PASS",
+    "sql": "SELECT SUM(amount) FROM Sales_Masters.Invoice_Header WHERE created_at >= CURDATE() - INTERVAL 1 MONTH",
+    "rows": 1,
+    "summary_snippet": "Total Revenue This Month\n\nDefinition:\nThe total revenue is the aggregate amount "
+  },
+  {
+    "q": "Who are our top 10 customers by revenue this year",
+    "status": "PASS",
+    "sql": "SELECT customer_name, SUM(total) AS total_revenue FROM Sales_Masters.Invoice_Header WHERE YEAR(created_at) = YEAR(CURDAT",
+    "rows": 5,
+    "summary_snippet": "Top 10 Customers by Revenue:\n\nSummary:\nThe top 10 customers by revenue are Beta "
+  },
+  {
+    "q": "Which products are selling the most this quarter",
+    "status": "PASS",
+    "sql": "SELECT T2.name AS product_name, SUM(T2.ordered_qty) AS total_qty_sold FROM Sales_Masters.SalesOrder_Header AS T1 JOIN Sa",
+    "rows": 6,
+    "summary_snippet": "Products Selling the Most this Quarter\n\nSummary:\nThe top-selling products are Ba"
+  },
+  {
+    "q": "What is our average order value this month",
+    "status": "PASS",
+    "sql": "SELECT AVG(grand_total) FROM Purchase_Masters.purchase_orders_Header WHERE po_date BETWEEN CURDATE() AND CURDATE() + INT",
+    "rows": 1,
+    "summary_snippet": "Average Order Value this Month\n\nDefinition:\nThe average order value (AOV) is a k"
+  },
+  {
+    "q": "How many sales orders are pending delivery right now",
+    "status": "FAIL-NO-DATA",
+    "sql": "SELECT COUNT(*) FROM Sales_Masters.SalesOrder_Header WHERE delivery_schedule IS NULL AND invoice_generated = 0",
+    "rows": 1,
+    "summary_snippet": "Sales Orders Pending Delivery:\n\nSummary:\nNo sales orders are pending delivery.\n\n"
+  },
+  {
+    "q": "What is the total value of invoices generated this week",
+    "status": "PASS",
+    "sql": "SELECT SUM(amount) FROM Sales_Masters.Invoice_Header WHERE created_at BETWEEN CURDATE() - INTERVAL 7 DAY AND CURDATE()",
+    "rows": 1,
+    "summary_snippet": "Invoices this Week\n\nDefinition:\nTotal value of invoices generated in a week.\n\nKe"
+  },
+  {
+    "q": "What is our total purchase spend this month",
+    "status": "PASS",
+    "sql": "SELECT SUM(grand_total) FROM Purchase_Masters.purchase_orders_Header WHERE YEAR(po_date) = YEAR(CURRENT_DATE)",
+    "rows": 1,
+    "summary_snippet": "Total Purchase Spend this Month:\n\nSummary:\nThe total purchase spend for this mon"
+  },
+  {
+    "q": "How many local purchase orders were made this month",
+    "status": "PASS",
+    "sql": "SELECT T1.po_id, T1.po_number, T1.po_date, T1.grand_total FROM Purchase_Masters.purchase_orders_Header AS T1 WHERE MONTH",
+    "rows": 2,
+    "summary_snippet": "Local Purchase Orders this Month:\n\nSummary:\nTwo local purchase orders were made "
+  },
+  {
+    "q": "How many import purchase orders are pending",
+    "status": "PASS",
+    "sql": "SELECT COUNT(T1.import_po_id) AS total_import_purchases FROM Purchase_Masters.import_purchase_orders_Header AS T1",
+    "rows": 1,
+    "summary_snippet": "Import Purchase Orders Pending\n\nDefinition:\nNumber of outstanding import purchas"
+  },
+  {
+    "q": "Which supplier do we buy from the most",
+    "status": "PASS",
+    "sql": "SELECT T2.name AS supplier_name, COUNT(T1.po_id) AS total_orders, SUM(T1.grand_total) AS total_value FROM Purchase_Maste",
+    "rows": 2,
+    "summary_snippet": "Supplier with Most Purchases:\n\nSummary:\nNippon Machinery Corp is the supplier wi"
+  },
+  {
+    "q": "What is our total import landed cost this year",
+    "status": "PASS",
+    "sql": "SELECT SUM(T1.total_landed_cost) AS total_import_landed_cost FROM Purchase_Masters.import_landed_costs_Header AS T1 WHER",
+    "rows": 1,
+    "summary_snippet": "Total Import Landed Cost This Year\n\nDefinition:\nThe total import landed cost is "
+  },
+  {
+    "q": "Which items have exceeded their reorder level",
+    "status": "PASS",
+    "sql": "SELECT T1.id AS item_id, T1.name, T1.reorderLevel, COALESCE(SUM(T2.current_qty), 0) AS current_stock FROM masters.items ",
+    "rows": 3,
+    "summary_snippet": "Exceeded Reorder Levels\n\nDefinition:\nAn item's reorder level is exceeded when it"
+  },
+  {
+    "q": "How many GRNs are pending this month",
+    "status": "PASS",
+    "sql": "SELECT COUNT(*) FROM Purchase_Masters.grn_Header WHERE grn_date BETWEEN CURDATE() AND CURDATE()",
+    "rows": 1,
+    "summary_snippet": "GRNs Pending this Month\n\nDefinition:\nA Goods Receipt Note (GRN) is a document us"
+  },
+  {
+    "q": "What is the current stock value of all items",
+    "status": "PASS",
+    "sql": "SELECT SUM(t.total_price) FROM Purchase_Masters.purchase_requisition_Details t WHERE t.pr_id IN (SELECT pr_id FROM Purch",
+    "rows": 1,
+    "summary_snippet": "Current Stock Value of All Items:\n\nSummary:\nThe total stock value of all items i"
+  },
+  {
+    "q": "Which items are running low on stock",
+    "status": "PASS",
+    "sql": "SELECT T1.id AS item_id, T1.name, T1.minStock, COALESCE(SUM(T2.current_qty), 0) AS current_stock FROM masters.items AS T",
+    "rows": 2,
+    "summary_snippet": "Low Stock Items:\n\nSummary:\nItems TN005 and TN001 are running low on stock.\n\nDeta"
+  },
+  {
+    "q": "Which items have zero stock",
+    "status": "PASS",
+    "sql": "SELECT T1.id AS item_id, T1.name, COALESCE(SUM(T2.current_qty), 0) AS current_stock FROM masters.items AS T1 LEFT JOIN P",
+    "rows": 6,
+    "summary_snippet": "Items with Zero Stock:\n\nSummary:\nThe following items have zero stock: Selendang "
+  },
+  {
+    "q": "What is the total value of pending purchase orders",
+    "status": "FAIL-NO-DATA",
+    "sql": "SELECT COUNT(T1.po_id) AS pending_pos, SUM(T1.grand_total) AS total_pending_value FROM Purchase_Masters.purchase_orders_",
+    "rows": 1,
+    "summary_snippet": "Total Value of Pending Purchase Orders:\n\nSummary:\nNo records found.\n\nDetails:\nNo"
+  },
+  {
+    "q": "What is our total import vs local purchase spend",
+    "status": "PASS",
+    "sql": "SELECT COUNT(T1.po_id) AS total_local_purchases FROM Purchase_Masters.purchase_orders_Header AS T1",
+    "rows": 1,
+    "summary_snippet": "Total Import vs Local Purchase Spend\n\nDefinition:\nThe difference between total i"
+  },
+  {
+    "q": "Which purchase requisitions are not converted to PO",
+    "status": "FAIL-NO-DATA",
+    "sql": "SELECT T1.pr_id, T1.pr_number, T1.pr_date, T1.department, T1.requested_by FROM Purchase_Masters.purchase_requisitions_He",
+    "rows": 0,
+    "summary_snippet": "Purchase Requisitions Not Converted to PO\n\nSummary:\nNo records were found for pu"
+  },
+  {
+    "q": "How many purchase returns were made this month",
+    "status": "FAIL-NO-DATA",
+    "sql": "SELECT COUNT(*) FROM Purchase_Masters.purchase_return_Header WHERE return_date BETWEEN CURDATE() AND CURDATE() + INTERVA",
+    "rows": 1,
+    "summary_snippet": "Purchase Returns this Month:\n\nSummary:\nNo purchase returns were made this month."
+  },
+  {
+    "q": "How many new sales orders were created this month",
+    "status": "FAIL-NO-DATA",
+    "sql": "SELECT COUNT(*) FROM Sales_Masters.SalesOrder_Header WHERE MONTH(date) = MONTH(CURDATE()) AND created_at > NOW() - INTER",
+    "rows": 1,
+    "summary_snippet": "New Sales Orders This Month:\n\nSummary:\nNo records found.\n\nDetails:\nNo relevant r"
+  },
+  {
+    "q": "What was our highest value invoice this month",
+    "status": "PASS",
+    "sql": "SELECT invoice_id, customer_name, total, created_at FROM Sales_Masters.Invoice_Header WHERE MONTH(created_at) = MONTH(CU",
+    "rows": 5,
+    "summary_snippet": "Highest Value Invoice this Month:\n\nSummary:\nThe highest value invoice this month"
+  },
+  {
+    "q": "What is the pending sales order backlog value",
+    "status": "PASS",
+    "sql": "SELECT SUM(pending_qty) FROM Sales_Masters.SalesOrder_Details WHERE pending_qty > 0",
+    "rows": 1,
+    "summary_snippet": "Pending Sales Order Backlog Value\n\nDefinition:\nThe pending sales order backlog v"
+  }
+]

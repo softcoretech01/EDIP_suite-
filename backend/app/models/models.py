@@ -103,6 +103,7 @@ class MetadataColumn(Base):
 class ChatHistory(Base):
     __tablename__ = "chat_history"
     id = Column(Integer, primary_key=True, index=True)
+    session_id = Column(String(50), index=True) # Groups multiple queries into one chat session
     tenant_id = Column(Integer, ForeignKey("tenants.id"))
     user_id = Column(Integer, ForeignKey("users.id"))
     question = Column(Text, nullable=False)

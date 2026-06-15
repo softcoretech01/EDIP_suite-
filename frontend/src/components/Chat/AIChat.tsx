@@ -6,16 +6,24 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 interface AIChatProps {
   onAsk: (question: string) => Promise<void>;
   isLoading: boolean;
+  value?: string;
+  onChange?: (value: string) => void;
+  clearOnSubmit?: boolean;
 }
 
-export const AIChat: React.FC<AIChatProps> = ({ onAsk, isLoading }) => {
-  const [question, setQuestion] = useState('');
+export const AIChat: React.FC<AIChatProps> = ({ onAsk, isLoading, value, onChange, clearOnSubmit = true }) => {
+  const [localQuestion, setLocalQuestion] = useState('');
+  
+  const question = value !== undefined ? value : localQuestion;
+  const setQuestion = onChange || setLocalQuestion;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (question.trim() && !isLoading) {
       onAsk(question);
-      setQuestion('');
+      if (clearOnSubmit) {
+        setQuestion('');
+      }
     }
   };
 
