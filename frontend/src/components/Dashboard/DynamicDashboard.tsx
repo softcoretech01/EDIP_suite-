@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Grid, Card, Divider } from '@mui/material';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -8,6 +7,21 @@ import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import TableViewIcon from '@mui/icons-material/TableView';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+  Legend
+} from 'recharts';
 
 export interface DashboardData {
   summary?: string;
@@ -98,7 +112,6 @@ export const DynamicDashboard: React.FC<DynamicDashboardProps> = ({ result }) =>
 
     switch (result.chart_type?.toLowerCase()) {
       case 'barchart':
-      case 'bar':
         return (
           <ResponsiveContainer width="100%" height={350}>
             <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -113,7 +126,6 @@ export const DynamicDashboard: React.FC<DynamicDashboardProps> = ({ result }) =>
           </ResponsiveContainer>
         );
       case 'linechart':
-      case 'line':
         return (
           <ResponsiveContainer width="100%" height={350}>
             <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -128,7 +140,6 @@ export const DynamicDashboard: React.FC<DynamicDashboardProps> = ({ result }) =>
           </ResponsiveContainer>
         );
       case 'piechart':
-      case 'pie':
         return (
           <ResponsiveContainer width="100%" height={350}>
             <PieChart>
@@ -141,11 +152,76 @@ export const DynamicDashboard: React.FC<DynamicDashboardProps> = ({ result }) =>
             </PieChart>
           </ResponsiveContainer>
         );
+      case 'donut':
+        return (
+          <ResponsiveContainer width="100%" height={350}>
+            <PieChart>
+              <Tooltip formatter={(value: any, name: any) => [formatValue(String(name), value), name]} contentStyle={{ backgroundColor: '#0F172A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+              <Legend />
+              <Pie
+                data={data}
+                dataKey={yKeys[0] || keys[0]}
+                nameKey={xKey}
+                cx="50%"
+                cy="50%"
+                innerRadius={70}
+                outerRadius={120}
+                label
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        );
+      case 'stackedbar':
+        return (
+          <ResponsiveContainer width="100%" height={350}>
+            <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis dataKey={xKey} stroke="#64748B" />
+              <YAxis stroke="#64748B" />
+              <Tooltip formatter={(value: any, name: any) => [formatValue(String(name), value), name]} contentStyle={{ backgroundColor: '#0F172A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+              <Legend />
+              {yKeys.map((key, index) => (
+                <Bar
+                  key={key}
+                  dataKey={key}
+                  stackId="a"
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
+        );
+      case 'horizontalbar':
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart
+              data={data}
+              layout="vertical"
+              margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <XAxis type="number" stroke="#64748B" />
+              <YAxis
+                dataKey={xKey}
+                type="category"
+                stroke="#64748B"
+              />
+              <Tooltip formatter={(value: any, name: any) => [formatValue(String(name), value), name]} contentStyle={{ backgroundColor: '#0F172A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#fff' }} />
+             <Bar
+  dataKey="value"
+  fill="#3B82F6"
+/>
+            </BarChart>
+          </ResponsiveContainer>
+        );
       case 'card':
-      case 'metric':
         return null; // Rendered in Key Metrics section instead
+      case 'table':
       default:
-        // Default to Table
         return (
           <TableContainer sx={{ maxHeight: 400, '&::-webkit-scrollbar': { width: '8px', height: '8px' }, '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '4px' } }}>
             <Table stickyHeader size="small">
@@ -175,7 +251,7 @@ export const DynamicDashboard: React.FC<DynamicDashboardProps> = ({ result }) =>
     }
   };
 
-  const isCardType = result.chart_type?.toLowerCase() === 'card' || result.chart_type?.toLowerCase() === 'metric';
+  const isCardType = result.chart_type?.toLowerCase() === 'card';
 
   return (
     <Paper sx={{ 
@@ -304,3 +380,7 @@ export const DynamicDashboard: React.FC<DynamicDashboardProps> = ({ result }) =>
     </Paper>
   );
 };
+
+
+
+

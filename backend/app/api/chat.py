@@ -6,7 +6,7 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from typing import List, Dict, Any
 
-from ..database.database import get_db
+from ..database.database import get_db, SessionLocal
 from ..models import models
 from . import schemas
 from ..auth.auth import get_current_user, HasPermission
@@ -97,6 +97,109 @@ embedder = MetadataEmbedder()
 ai_service = OllamaService()
 
 OLLAMA_TIMEOUT_SECONDS = 50  # Hard ceiling for Ollama response
+
+
+def detect_chart_type(question: str) -> str:
+    """
+    Detect chart type based on user question.
+    """
+    q_lower = question.lower().strip()
+
+    # Explicit chart requests
+    if "stackedbar" in q_lower or "stacked bar" in q_lower:
+        return "stackedbar"
+
+    if "horizontalbar" in q_lower or "horizontal bar" in q_lower:
+        return "horizontalbar"
+
+    if "donut" in q_lower:
+        return "donut"
+
+    if "piechart" in q_lower or "pie chart" in q_lower:
+        return "piechart"
+
+    if "barchart" in q_lower or "bar chart" in q_lower:
+        return "barchart"
+
+    if "linechart" in q_lower or "line chart" in q_lower:
+        return "linechart"
+
+    if "card" in q_lower or "kpi" in q_lower or "metric" in q_lower:
+        return "card"
+
+    if any(k in q_lower for k in ["table", "list", "details", "records"]):
+        return "table"
+
+    # KPI Cards
+    if any(k in q_lower for k in [
+        "how many",
+        "count",
+        "total",
+        "average",
+        "sum"
+    ]):
+        return "card"
+
+    # Customer ranking → Horizontal Bar
+    if (
+        "customer" in q_lower and
+        any(k in q_lower for k in [
+            "top",
+            "best",
+            "rank",
+            "ranking",
+            "highest",
+            "revenue"
+        ])
+    ):
+        return "horizontalbar"
+
+    # Stacked Bar
+    if (
+        ("local" in q_lower and "import" in q_lower)
+        or "stacked" in q_lower
+    ):
+        return "stackedbar"
+
+    # Donut / Pie
+    if any(k in q_lower for k in [
+        "breakdown",
+        "share",
+        "percentage",
+        "distribution",
+        "split"
+    ]):
+        return "donut"
+
+    # Line Chart
+    if any(k in q_lower for k in [
+        "trend",
+        "growth",
+        "over time",
+        "monthly",
+        "weekly",
+        "daily",
+        "yearly",
+        "timeline"
+    ]):
+        return "linechart"
+
+    # Bar Chart
+    if any(k in q_lower for k in [
+        "compare",
+        "comparison",
+        "vs",
+        "versus",
+        "top",
+        "best",
+        "most",
+        "highest",
+        "by"
+    ]):
+        return "barchart"
+
+    return "table"
+
 
 
 def build_error_hint(error_str: str, schema_context: str, failed_sql: str) -> str:
@@ -740,6 +843,56 @@ def get_minimal_schema(user_question: str) -> str:
 
 
 
+def save_chat_history_and_log(
+    tenant_id: int,
+    user_id: int,
+    session_id: str,
+    question: str,
+    generated_sql: str,
+    response_json: dict,
+    execution_time_ms: int,
+    view_mode: str,
+    log_status: str = "success",
+    error_message: str = None
+):
+    """
+    Saves the chat history and query logs using a fresh SessionLocal connection.
+    This prevents connection drop errors due to idle time during LLM calls.
+    """
+    with SessionLocal() as db:
+        try:
+            if generated_sql and not generated_sql.startswith("["):
+                log = models.QueryLog(
+                    tenant_id=tenant_id,
+                    user_id=user_id,
+                    sql_query=generated_sql,
+                    status=log_status,
+                    error_message=error_message
+                )
+                db.add(log)
+                db.commit()
+        except Exception as e:
+            print(f"[save_chat_history_and_log] Failed to write QueryLog: {e}")
+            db.rollback()
+
+        try:
+            if view_mode != "dashboard":
+                chat_history = models.ChatHistory(
+                    session_id=session_id,
+                    tenant_id=tenant_id,
+                    user_id=user_id,
+                    question=question,
+                    generated_sql=generated_sql,
+                    response_json=response_json,
+                    execution_time_ms=execution_time_ms
+                )
+                db.add(chat_history)
+                db.commit()
+        except Exception as e:
+            print(f"[save_chat_history_and_log] Failed to write ChatHistory: {e}")
+            db.rollback()
+
+
 @router.post("/ask")
 async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_db), current_user: models.User = Depends(HasPermission("chat_erp"))):
     def clean_response(res: dict) -> dict:
@@ -789,30 +942,32 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
         ).count()
         
         if uploaded_files_count > 0:
-            # We search Qdrant for matching chunks
-            query_vector = embedder.embed_text(request.question)
-            matched_chunks = qdrant_doc_service.search_relevant_chunks(
-                tenant_id=current_user.tenant_id,
-                user_id=current_user.id,
-                query_vector=query_vector,
-                limit=5
-            )
-            
-            # Determine if this query matches the documents
-            is_doc_query = False
-            best_score = matched_chunks[0]["score"] if matched_chunks else 0.0
-            
-            # Define explicit keywords to route to documents
-            doc_keywords = {"document", "file", "uploaded", "excel", "pdf", "docx", "sheet", "client data", "uploaded data"}
+            # Optimize: Only generate embedding if the question contains document keywords
+            # or doesn't match standard database keywords. This avoids 3s CPU latency on DB queries.
+            doc_keywords = {"document", "file", "uploaded", "excel", "pdf", "docx", "sheet", "client data", "uploaded data", "attachment", "upload"}
             has_doc_keyword = any(kw in q_lower for kw in doc_keywords)
+            db_keywords = {"select", "show", "count", "average", "total", "invoice", "sales", "purchase", "supplier", "customer", "inventory", "stock", "grn", "requisition", "return", "landed cost"}
+            has_db_keyword = any(kw in q_lower for kw in db_keywords)
             
-            if matched_chunks:
-                # If similarity is very high, or if we have a keyword and similarity is reasonably high
-                if best_score >= 0.70:
-                    is_doc_query = True
-                elif has_doc_keyword and best_score >= 0.55:
-                    is_doc_query = True
-                    
+            is_doc_query = False
+            if has_doc_keyword or not has_db_keyword:
+                query_vector = embedder.embed_text(request.question)
+                matched_chunks = qdrant_doc_service.search_relevant_chunks(
+                    tenant_id=current_user.tenant_id,
+                    user_id=current_user.id,
+                    query_vector=query_vector,
+                    limit=5
+                )
+                
+                best_score = matched_chunks[0]["score"] if matched_chunks else 0.0
+                
+                if matched_chunks:
+                    # If similarity is very high, or if we have a keyword and similarity is reasonably high
+                    if best_score >= 0.70:
+                        is_doc_query = True
+                    elif has_doc_keyword and best_score >= 0.55:
+                        is_doc_query = True
+                        
             if is_doc_query:
                 # Retrieve the RAG response
                 loop = asyncio.get_event_loop()
@@ -851,18 +1006,16 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
                 llm_response = clean_response(llm_response)
                 
                 # Record chat history
-                if request.view_mode != "dashboard":
-                    chat_history = models.ChatHistory(
-                        session_id=request.session_id,
-                        tenant_id=current_user.tenant_id,
-                        user_id=current_user.id,
-                        question=request.question,
-                        generated_sql="[RAG Vector Search - Uploaded Documents]",
-                        response_json=llm_response,
-                        execution_time_ms=int((time.time() - start_time) * 1000)
-                    )
-                    db.add(chat_history)
-                    db.commit()
+                save_chat_history_and_log(
+                    tenant_id=current_user.tenant_id,
+                    user_id=current_user.id,
+                    session_id=request.session_id,
+                    question=request.question,
+                    generated_sql="[RAG Vector Search - Uploaded Documents]",
+                    response_json=llm_response,
+                    execution_time_ms=int((time.time() - start_time) * 1000),
+                    view_mode=request.view_mode
+                )
                     
                 return llm_response
 
@@ -880,7 +1033,7 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
                         _executor,
                         lambda: ai_service.generate_general_response(request.question)
                     ),
-                    timeout=20
+                    timeout=60
                 )
             except Exception as e:
                 print(f"RAG definition generation failed: {e}")
@@ -896,18 +1049,16 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
             }
             
             llm_response = clean_response(llm_response)
-            if request.view_mode != "dashboard":
-                chat_history = models.ChatHistory(
-                    session_id=request.session_id,
-                    tenant_id=current_user.tenant_id,
-                    user_id=current_user.id,
-                    question=request.question,
-                    generated_sql="",
-                    response_json=llm_response,
-                    execution_time_ms=int((time.time() - start_time) * 1000)
-                )
-                db.add(chat_history)
-                db.commit()
+            save_chat_history_and_log(
+                tenant_id=current_user.tenant_id,
+                user_id=current_user.id,
+                session_id=request.session_id,
+                question=request.question,
+                generated_sql="",
+                response_json=llm_response,
+                execution_time_ms=int((time.time() - start_time) * 1000),
+                view_mode=request.view_mode
+            )
             
             return llm_response
 
@@ -959,7 +1110,7 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
                             _executor,
                             lambda: ai_service.generate_rag_response(request.question, tables_data)
                         ),
-                        timeout=20
+                        timeout=60
                     )
                 except Exception as e:
                     print(f"RAG table summary generation failed: {e}")
@@ -974,28 +1125,19 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
                     "recommendations": []
                 }
 
-                log = models.QueryLog(
+                if llm_response and llm_response.get("chart_type") != "text":
+                    llm_response["chart_type"] = detect_chart_type(request.question)
+                llm_response = clean_response(llm_response)
+                save_chat_history_and_log(
                     tenant_id=current_user.tenant_id,
                     user_id=current_user.id,
-                    sql_query=sql_query,
-                    status="success"
+                    session_id=request.session_id,
+                    question=request.question,
+                    generated_sql=sql_query,
+                    response_json=llm_response,
+                    execution_time_ms=int((time.time() - start_time) * 1000),
+                    view_mode=request.view_mode
                 )
-                db.add(log)
-                db.commit()
-
-                llm_response = clean_response(llm_response)
-                if request.view_mode != "dashboard":
-                    chat_history = models.ChatHistory(
-                        session_id=request.session_id,
-                        tenant_id=current_user.tenant_id,
-                        user_id=current_user.id,
-                        question=request.question,
-                        generated_sql=sql_query,
-                        response_json=llm_response,
-                        execution_time_ms=int((time.time() - start_time) * 1000)
-                    )
-                    db.add(chat_history)
-                    db.commit()
 
                 return llm_response
 
@@ -1142,13 +1284,28 @@ async def ask_question(request: schemas.ChatRequest, db: Session = Depends(get_d
                         "chart_type": "card",
                         "summary": ""
                     }
+                elif re.search(r'\b(sales|revenue|invoice)s?\b', q_lower) and re.search(r'\b(this month|month|today|this week|this year)\b', q_lower) and not re.search(r'\b(local|import|purchase|supplier|grn|requisition|return|sales order|so)\b', q_lower):
+                    if re.search(r'\b(list|show|all)\b', q_lower):
+                        llm_response = {
+                            "sql": "SELECT T1.invoice_id, T1.customer_name, T1.total, T1.created_at FROM Sales_Masters.Invoice_Header AS T1 WHERE MONTH(T1.created_at) = MONTH(CURDATE()) AND YEAR(T1.created_at) = YEAR(CURDATE()) ORDER BY T1.created_at DESC",
+                            "chart_type": "table",
+                            "summary": ""
+                        }
+                    else:
+                        llm_response = {
+                            "sql": "SELECT COUNT(*) AS total_sales FROM Sales_Masters.Invoice_Header AS T1 WHERE MONTH(T1.created_at) = MONTH(CURDATE()) AND YEAR(T1.created_at) = YEAR(CURDATE())",
+                            "chart_type": "card",
+                            "dashboard_type": "comparison",
+                            "title": "Total Sales This Month",
+                            "summary": ""
+                        }
                 elif re.search(r'compare', q_lower) and re.search(r'months?', q_lower) and re.search(r'sales', q_lower):
                     import re as inline_re
                     m = inline_re.search(r'(\d+)\s+months?', q_lower)
                     num_months = int(m.group(1)) if m else 3
                     llm_response = {
                         "sql": f"SELECT DATE_FORMAT(T1.created_at, '%Y-%m') AS sale_month, SUM(T1.total) AS total_sales FROM Sales_Masters.Invoice_Header AS T1 WHERE T1.created_at >= DATE_SUB(CURDATE(), INTERVAL {num_months} MONTH) GROUP BY sale_month ORDER BY sale_month ASC",
-                        "chart_type": "card",
+                        "chart_type": "linechart",
                         "dashboard_type": "comparison",
                         "summary": ""
                     }
@@ -1384,7 +1541,7 @@ RESPONSE RULES:
                                 _executor,
                                 lambda: ai_service._call_ollama(prompt)
                             ),
-                            timeout=20
+                            timeout=60
                         )
                         llm_response["summary"] = summary.strip()
                     except Exception as e:
@@ -1422,15 +1579,18 @@ RESPONSE RULES:
             if not is_safe:
                 print(f"[SQL-BLOCKED] Reason: {reason}")
                 print(f"[SQL-BLOCKED] SQL was: {generated_sql[:500]}")
-                log = models.QueryLog(
+                save_chat_history_and_log(
                     tenant_id=current_user.tenant_id,
                     user_id=current_user.id,
-                    sql_query=generated_sql,
-                    status="blocked",
+                    session_id=request.session_id,
+                    question=request.question,
+                    generated_sql=generated_sql,
+                    response_json={},
+                    execution_time_ms=0,
+                    view_mode=request.view_mode,
+                    log_status="blocked",
                     error_message=reason
                 )
-                db.add(log)
-                db.commit()
                 raise HTTPException(status_code=403, detail=f"Query blocked by security policy: {reason}")
 
             # 5b-2. Validate SQL (schema check)
@@ -1441,15 +1601,18 @@ RESPONSE RULES:
                     last_db_error = validation_reason
                     continue
                 # All retries exhausted on validation
-                log = models.QueryLog(
+                save_chat_history_and_log(
                     tenant_id=current_user.tenant_id,
                     user_id=current_user.id,
-                    sql_query=generated_sql,
-                    status="error",
+                    session_id=request.session_id,
+                    question=request.question,
+                    generated_sql=generated_sql,
+                    response_json={},
+                    execution_time_ms=0,
+                    view_mode=request.view_mode,
+                    log_status="error",
                     error_message=validation_reason
                 )
-                db.add(log)
-                db.commit()
                 return clean_response({
                     "summary": f"I was unable to generate a valid query for your question. Please try rephrasing it.",
                     "data": [],
@@ -1479,15 +1642,18 @@ RESPONSE RULES:
                     last_db_error = build_error_hint(db_error_str, schema_context, generated_sql)
                     continue
                 # All retries exhausted — log and return graceful error
-                log = models.QueryLog(
+                save_chat_history_and_log(
                     tenant_id=current_user.tenant_id,
                     user_id=current_user.id,
-                    sql_query=generated_sql,
-                    status="error",
+                    session_id=request.session_id,
+                    question=request.question,
+                    generated_sql=generated_sql,
+                    response_json={},
+                    execution_time_ms=0,
+                    view_mode=request.view_mode,
+                    log_status="error",
                     error_message=db_error_str
                 )
-                db.add(log)
-                db.commit()
                 return clean_response({
                     "summary": "I encountered a database error while executing your query. The data may not be available for the requested time period.",
                     "data": [],
@@ -1537,34 +1703,46 @@ RESPONSE RULES:
 
             
             if not data:
-                # Smart empty message: let LLM explain what the empty result means
+                # Smart empty message
                 try:
                     empty_msg = await asyncio.wait_for(
                         loop.run_in_executor(
                             _executor,
-                            lambda: ai_service.generate_rag_response(request.question, [])
+                            lambda: ai_service.generate_rag_and_insights(request.question, [])
                         ),
                         timeout=15
                     )
-                    summary = empty_msg if empty_msg else "No records match your current filter criteria."
+                    summary = empty_msg.get("summary") or "No records match your current filter criteria."
+                    insights_data = empty_msg
                 except Exception:
                     summary = "No records match your current filter criteria."
+                    insights_data = {"summary": summary, "business_insights": [], "recommendations": []}
             else:
                 try:
-                    summary = await asyncio.wait_for(
+                    # Single-pass combined RAG and Insights generation (extremely fast)
+                    insights_data = await asyncio.wait_for(
                         loop.run_in_executor(
                             _executor,
-                            lambda: ai_service.generate_rag_response(request.question, data)
+                            lambda: ai_service.generate_rag_and_insights(request.question, data)
                         ),
-                        timeout=20
+                        timeout=25
                     )
+                    summary = insights_data.get("summary") or "Here is the data you requested."
                 except Exception as e:
-                    print(f"RAG summary generation failed: {e}")
+                    print(f"RAG combined generation failed: {e}")
                     summary = "Here is the data you requested."
-            if "dashboard_type" in llm_response:
+                    insights_data = {"summary": summary, "business_insights": [], "recommendations": []}
+
+            if "dashboard_type" in llm_response or request.view_mode == "dashboard":
                 llm_response["summary"] = [summary]
                 llm_response["chart_data"] = data
                 llm_response["executive_summary"] = summary
+                llm_response["business_insights"] = insights_data.get("business_insights", [])
+                llm_response["recommendations"] = insights_data.get("recommendations", [])
+                if not llm_response["business_insights"]:
+                    llm_response["business_insights"] = ["Review the detailed records to identify potential areas of concern."]
+                if not llm_response["recommendations"]:
+                    llm_response["recommendations"] = ["Optimize operations based on the current records."]
             else:
                 llm_response["summary"] = summary
                 llm_response["executive_summary"] = summary
@@ -1572,30 +1750,21 @@ RESPONSE RULES:
                 llm_response["recommendations"] = []
 
 
-        # 7. Log success
-        log = models.QueryLog(
+        # 7. Log success and save chat history using fresh session
+        execution_time_ms = int((time.time() - start_time) * 1000)
+        if llm_response and llm_response.get("chart_type") != "text":
+            llm_response["chart_type"] = detect_chart_type(request.question)
+        llm_response = clean_response(llm_response)
+        save_chat_history_and_log(
             tenant_id=current_user.tenant_id,
             user_id=current_user.id,
-            sql_query=generated_sql,
-            status="success"
+            session_id=request.session_id,
+            question=request.question,
+            generated_sql=generated_sql,
+            response_json=llm_response,
+            execution_time_ms=execution_time_ms,
+            view_mode=request.view_mode
         )
-        db.add(log)
-        db.commit()
-
-        execution_time_ms = int((time.time() - start_time) * 1000)
-        llm_response = clean_response(llm_response)
-        if request.view_mode != "dashboard":
-            chat_history = models.ChatHistory(
-                session_id=request.session_id,
-                tenant_id=current_user.tenant_id,
-                user_id=current_user.id,
-                question=request.question,
-                generated_sql=generated_sql,
-                response_json=llm_response,
-                execution_time_ms=execution_time_ms
-            )
-            db.add(chat_history)
-            db.commit()
 
         return llm_response
 

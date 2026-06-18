@@ -1,7 +1,7 @@
 import requests
 import json
 
-BASE_URL = "http://localhost:8001"
+BASE_URL = "http://localhost:8000"
 
 # 1. Login
 login_res = requests.post(f"{BASE_URL}/auth/login", json={
@@ -12,7 +12,7 @@ print("Login Status:", login_res.status_code)
 import requests
 import json
 
-BASE_URL = "http://localhost:8001"
+BASE_URL = "http://localhost:8000"
 
 # 1. Login
 login_res = requests.post(f"{BASE_URL}/auth/login", json={

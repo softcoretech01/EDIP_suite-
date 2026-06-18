@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 import os
+import urllib.parse
 from dotenv import load_dotenv
 
 load_dotenv(override=True)
@@ -10,7 +11,8 @@ host = os.getenv("MYSQL_HOST")
 port = os.getenv("MYSQL_PORT")
 db = os.getenv("MYSQL_DATABASE")
 
-url = f"mysql+pymysql://{user}:{pwd}@{host}:{port}/{db}"
+quoted_pwd = urllib.parse.quote_plus(pwd) if pwd else ""
+url = f"mysql+pymysql://{user}:{quoted_pwd}@{host}:{port}/{db}"
 print(f"Connecting to {host}:{port}...")
 
 try:

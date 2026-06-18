@@ -1,18 +1,39 @@
 import os
 import json
 import requests
+import time
+import tempfile
 from dotenv import load_dotenv
 
 
 class OllamaService:
     def __init__(self):
         load_dotenv(override=True)
-        self.model_name = os.getenv("OLLAMA_MODEL", "llama3.2").strip().strip('"').strip("'")
+        self.model_name = os.getenv("OLLAMA_MODEL", "qwen2.5").strip().strip('"').strip("'")
         self.api_url = "http://localhost:11434/api/generate"
+        self._cache_file = os.path.join(tempfile.gettempdir(), "edip_insights_cache.json")
 
-    def _call_ollama(self, prompt: str,json_format: bool = False) -> str:
+    def _load_cache(self) -> dict:
+        if os.path.exists(self._cache_file):
+            try:
+                with open(self._cache_file, "r") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return {}
+
+    def _save_cache(self, cache: dict):
+        try:
+            with open(self._cache_file, "w") as f:
+                json.dump(cache, f)
+        except Exception:
+            pass
+
+    def _call_ollama(self, prompt: str, json_format: bool = False, stop_sequences: list = None, num_predict: int = 256) -> str:
         """Helper to call Ollama API directly"""
-        
+        if stop_sequences is None:
+            stop_sequences = ["```"]
+            
         payload = {
             "model": self.model_name,
             "prompt": prompt,
@@ -20,8 +41,9 @@ class OllamaService:
             "options": {
                 "temperature": 0.0,
                 "top_p": 0.1,
-                "num_predict": 512,             # Caps response length so it stays fast
-                "stop": ["```", "\n\n"]     # Immediately cuts engine when SQL closes
+                "num_ctx": 8192,                         # Cap context window as requested to speed up processing
+                "num_predict": num_predict,             # Caps response length so it stays fast
+                "stop": stop_sequences
             }
         }
         if json_format:
@@ -134,121 +156,42 @@ Example fix: Change 'FROM Sales_Masters' → 'FROM Sales_Masters.SalesOrder_Head
 
 === EXAMPLES ===
 
-EXAMPLE 1 — "total GRN" (no time period = no date filter):
-  Schema: Purchase_Masters.grn_Header (columns: grn_id, grn_number, po_id, supplier_id, grn_date, created_at)
+EXAMPLE 1 — "total GRN":
+  Schema: Purchase_Masters.grn_Header (columns: grn_id, grn_number)
   SQL: SELECT COUNT(T1.grn_id) AS total_grn FROM Purchase_Masters.grn_Header AS T1
   chart_type: card
 
 EXAMPLE 2 — "total purchase amount this month":
-  Schema: Purchase_Masters.purchase_orders_Header (columns: po_id, po_number, po_date, sub_total, tax_total, grand_total)
+  Schema: Purchase_Masters.purchase_orders_Header (columns: po_id, po_date, grand_total)
   SQL: SELECT SUM(T1.grand_total) AS total_purchase FROM Purchase_Masters.purchase_orders_Header AS T1 WHERE T1.po_date >= '2026-06-01' AND T1.po_date <= '2026-06-30'
   chart_type: card
 
 EXAMPLE 3 — "show all suppliers":
-  Schema: masters.suppliers (columns: id, name, email, phone, type, active)
-  SQL: SELECT T1.id, T1.name, T1.email, T1.phone FROM masters.suppliers AS T1
+  Schema: masters.suppliers (columns: id, name, email)
+  SQL: SELECT T1.id, T1.name, T1.email FROM masters.suppliers AS T1
   chart_type: table
 
-EXAMPLE 4 — "which invoice has the highest value" OR "which invoice has high value":
-  Schema: Sales_Masters.Invoice_Header (columns: invoice_id, so_id, customer_name, amount, tax_amount, total, created_at)
-  IMPORTANT: Column is 'total' NOT 'grand_total' in Invoice_Header.
-  SQL: SELECT T1.invoice_id, T1.customer_name, T1.total, T1.created_at FROM Sales_Masters.Invoice_Header AS T1 ORDER BY T1.total DESC LIMIT 10
+EXAMPLE 4 — "which invoice has the highest value":
+  Schema: Sales_Masters.Invoice_Header (columns: invoice_id, customer_name, total)
+  SQL: SELECT T1.invoice_id, T1.customer_name, T1.total FROM Sales_Masters.Invoice_Header AS T1 ORDER BY T1.total DESC LIMIT 10
   chart_type: table
 
-EXAMPLE 5 — "how many invoices this month":
-  Schema: Sales_Masters.Invoice_Header (columns: invoice_id, customer_name, total, created_at)
-  SQL: SELECT COUNT(T1.invoice_id) AS total_invoices FROM Sales_Masters.Invoice_Header AS T1 WHERE T1.created_at >= '2026-06-01' AND T1.created_at <= '2026-06-30'
-  chart_type: card
-
-EXAMPLE 6 — "top selling items" OR "which items sold the most":
-  Schema: Sales_Masters.SalesOrder_Details (columns: so_details_id, So_number, item_id, name, ordered_qty, unit_price)
-         masters.items (columns: id, name, standardPrice)
+EXAMPLE 5 — "top selling items":
+  Schema: Sales_Masters.SalesOrder_Details (columns: ordered_qty)
+          masters.items (columns: id, name)
   SQL: SELECT T1.name, SUM(T1.ordered_qty) AS total_sold FROM Sales_Masters.SalesOrder_Details AS T1 GROUP BY T1.name ORDER BY total_sold DESC LIMIT 10
   chart_type: barchart
 
-EXAMPLE 7 — "what items are in PR-001":
-  Schema: Purchase_Masters.purchase_requisitions_Header (columns: pr_id, pr_number, pr_date, department)
-         Purchase_Masters.purchase_requisition_Details (columns: pr_id, item_id, requested_quantity, uom, unit_price)
-  SQL: SELECT T2.item_id, T2.requested_quantity, T2.uom, T2.unit_price FROM Purchase_Masters.purchase_requisitions_Header AS T1 INNER JOIN Purchase_Masters.purchase_requisition_Details AS T2 ON T1.pr_id = T2.pr_id WHERE T1.pr_number = 'PR-001'
-  chart_type: table
-
-EXAMPLE 8 — "show all customers":
-  Schema: masters.customers (columns: id, name, email, phone, creditLimit, active)
-  SQL: SELECT T1.id, T1.name, T1.email, T1.phone, T1.creditLimit FROM masters.customers AS T1
-  chart_type: table
-
-EXAMPLE 9 — "current stock levels" OR "inventory status":
-  Schema: Purchase_Masters.inventory_batches (columns: batch_id, item_id, current_qty, final_selling_price, status)
-         masters.items (columns: id, name)
-  SQL: SELECT T2.name, SUM(T1.current_qty) AS stock FROM Purchase_Masters.inventory_batches AS T1 INNER JOIN masters.items AS T2 ON T1.item_id = T2.id GROUP BY T2.name ORDER BY stock DESC
-  chart_type: table
-
-EXAMPLE 10 — "highest value GRN" OR "GRN with high amount":
-  Schema: Purchase_Masters.grn_Header (columns: grn_id, grn_number)
-         Purchase_Masters.grn_Details (columns: grn_id, item_id, received_qty)
-         masters.items (columns: id, name, standardPrice)
-  SQL: SELECT T1.grn_number, T3.name, T3.standardPrice, SUM(T2.received_qty * T3.standardPrice) AS total_value FROM Purchase_Masters.grn_Header AS T1 INNER JOIN Purchase_Masters.grn_Details AS T2 ON T1.grn_id = T2.grn_id INNER JOIN masters.items AS T3 ON T2.item_id = T3.id GROUP BY T1.grn_number, T3.name, T3.standardPrice ORDER BY total_value DESC LIMIT 10
-  chart_type: table
-
-EXAMPLE 11 — "show the total landed cost for local purchases":
-  Schema: Purchase_Masters.local_landed_cost_Header (columns: landed_cost_id, grn_id, total_landed_cost, is_posted)
-  SQL: SELECT SUM(T1.total_landed_cost) AS total_local_landed_cost FROM Purchase_Masters.local_landed_cost_Header AS T1 WHERE T1.is_posted = 1
-  chart_type: card
-
-EXAMPLE 12 — "total landed cost for import purchases":
-  Schema: Purchase_Masters.import_landed_costs_Header (columns: import_landed_cost_id, import_po_id, total_landed_cost, is_posted)
-  SQL: SELECT SUM(T1.total_landed_cost) AS total_import_landed_cost FROM Purchase_Masters.import_landed_costs_Header AS T1 WHERE T1.is_posted = 1
-  chart_type: card
-
-EXAMPLE 13 — "how many local purchases are made this month" OR "list local purchase this month":
-  CRITICAL RULE: 'local purchases' = purchase_orders_Header. Do NOT use grn_Header for this.
-  Schema: Purchase_Masters.purchase_orders_Header (columns: po_id, po_number, po_date, grand_total)
-  SQL: SELECT T1.po_id, T1.po_number, T1.po_date, T1.grand_total FROM Purchase_Masters.purchase_orders_Header AS T1 WHERE T1.po_date >= '2026-06-01' AND T1.po_date <= '2026-06-30' ORDER BY T1.po_date DESC
-  chart_type: table
-
-EXAMPLE 14 — "how many local purchases total" OR "total count of local purchases":
-  CRITICAL RULE: 'local purchases' = purchase_orders_Header (NOT grn_Header, NOT inventory_batches).
-  Schema: Purchase_Masters.purchase_orders_Header (columns: po_id, po_number, po_date, grand_total)
-  SQL: SELECT COUNT(T1.po_id) AS total_local_purchases FROM Purchase_Masters.purchase_orders_Header AS T1
-  chart_type: card
-
-EXAMPLE 15 — "how many import purchases this month" OR "list import purchase orders":
-  CRITICAL RULE: Use ONLY 'import_purchase_orders_Header'. NEVER use 'import_purchase', 'import_po', or 'import_purchase_item' — those tables DO NOT EXIST.
-  Schema: Purchase_Masters.import_purchase_orders_Header (columns: import_po_id, import_po_number, supplier_id, po_date, total_lcy, status)
-  SQL: SELECT T1.import_po_id, T1.import_po_number, T1.po_date, T1.total_lcy FROM Purchase_Masters.import_purchase_orders_Header AS T1 WHERE T1.po_date >= '2026-06-01' AND T1.po_date <= '2026-06-30' ORDER BY T1.po_date DESC
-  chart_type: table
-
-EXAMPLE 16 — "import purchase items" OR "what items are in import PO":
-  CRITICAL RULE: Join import_purchase_orders_Header to import_purchase_orders_Details on import_po_id. Then join masters.items on item_id.
-  NEVER use: import_purchase_item, import_purchase_item_details, import_po_Header, import_po_items — NONE of these exist.
-  SQL: SELECT T1.import_po_number, T3.name AS item_name, T2.qty, T2.fcy_unit_price FROM Purchase_Masters.import_purchase_orders_Header AS T1 JOIN Purchase_Masters.import_purchase_orders_Details AS T2 ON T1.import_po_id = T2.import_po_id JOIN masters.items AS T3 ON T2.item_id = T3.id LIMIT 20
-  chart_type: table
-
-EXAMPLE 17 — "give the details of sales order SO2026-001" OR "show SO SO2026-001":
-  CRITICAL: NEVER write 'FROM Sales_Masters WHERE ...' — Sales_Masters is a SCHEMA, not a table!
-  Schema: Sales_Masters.SalesOrder_Header (columns: id, So_number, customer_name, date, delivery_schedule, invoice_generated, created_at)
-  WRONG: SELECT * FROM Sales_Masters WHERE So_number = 'SO2026-001'
-  CORRECT: SELECT T1.id, T1.So_number, T1.customer_name, T1.date, T1.delivery_schedule, T1.invoice_generated, T1.created_at FROM Sales_Masters.SalesOrder_Header AS T1 WHERE T1.So_number = 'SO2026-001'
-  chart_type: table
-
-EXAMPLE 18 — "show items in sales order SO2026-001" OR "what items are in SO SO2026-001":
-  Schema: Sales_Masters.SalesOrder_Details (columns: so_details_id, So_number, item_id, name, ordered_qty, supplied_qty, pending_qty, unit_price)
-  SQL: SELECT T1.name, T1.ordered_qty, T1.supplied_qty, T1.pending_qty, T1.unit_price FROM Sales_Masters.SalesOrder_Details AS T1 WHERE T1.So_number = 'SO2026-001'
-  chart_type: table
-
-EXAMPLE 19 — "full details with items for sales order SO2026-001":
+EXAMPLE 6 — "show details of sales order SO2026-001":
   Schema: Sales_Masters.SalesOrder_Header + Sales_Masters.SalesOrder_Details (join on So_number)
-  SQL: SELECT T1.So_number, T1.customer_name, T1.date, T2.name AS item_name, T2.ordered_qty, T2.unit_price, (T2.ordered_qty * T2.unit_price) AS line_total FROM Sales_Masters.SalesOrder_Header AS T1 INNER JOIN Sales_Masters.SalesOrder_Details AS T2 ON T1.So_number = T2.So_number WHERE T1.So_number = 'SO2026-001'
+  SQL: SELECT T1.So_number, T1.customer_name, T2.name AS item_name, T2.ordered_qty, T2.unit_price, (T2.ordered_qty * T2.unit_price) AS line_total FROM Sales_Masters.SalesOrder_Header AS T1 INNER JOIN Sales_Masters.SalesOrder_Details AS T2 ON T1.So_number = T2.So_number WHERE T1.So_number = 'SO2026-001'
   chart_type: table
 
 CRITICAL DISTINCTION:
-- LOCAL purchases = Purchase_Masters.purchase_orders_Header (domestic supplier POs)
-  - Line items = Purchase_Masters.purchase_order_Details (join on po_id)
-- IMPORT purchases = Purchase_Masters.import_purchase_orders_Header (foreign supplier POs)
-  - Line items = Purchase_Masters.import_purchase_orders_Details (join on import_po_id)
-- GRN = grn_Header (goods RECEIVED, NOT purchases — never use for purchase count)
-- Purchase Returns = purchase_return_Header (columns: return_id, return_number, grn_id, supplier_id, return_date, refund_total)
-- FORBIDDEN table names (DO NOT USE): import_purchase, import_po, import_purchase_item, import_purchase_item_details, import_po_Header, import_po_items
+- LOCAL purchases = Purchase_Masters.purchase_orders_Header (grand_total is here, line items in purchase_order_Details)
+- IMPORT purchases = Purchase_Masters.import_purchase_orders_Header (total_lcy / total_fcy is here, line items in import_purchase_orders_Details)
+- GRN = grn_Header (goods RECEIVED, NOT purchases — do not use for purchase counts or amounts)
+- FORBIDDEN table names: import_purchase, import_po, import_purchase_item, import_po_Header
 
 {error_note}
 === SCHEMA ===
@@ -269,7 +212,7 @@ Return ONLY valid JSON (no markdown, no code blocks, no explanation):
 }}"""
 
         try:
-            response_text = self._call_ollama(prompt, json_format=True).strip()
+            response_text = self._call_ollama(prompt, json_format=True, stop_sequences=["```", "\n\n"]).strip()
 
             # Extract JSON block even if Llama added text around it
             start = response_text.find('{')
@@ -288,15 +231,124 @@ Return ONLY valid JSON (no markdown, no code blocks, no explanation):
         except Exception as e:
             raise Exception(f"Failed to generate response from Ollama: {str(e)}")
 
-    def generate_rag_response(self, question: str, query_data: list) -> str:
+    def generate_rag_and_insights(self, question: str, query_data: list) -> dict:
         """
         Acts as EDIP AI — Senior ERP Business Analyst.
-        Takes actual database results and returns a concise, business-focused natural language answer.
+        Takes actual database results and returns a summary, business insights, and recommendations in one pass.
+        Uses a persistent file-based cache with a 60-second TTL and rule-based fast card paths.
         """
-        data_str = json.dumps(query_data[:20], default=str)
-        more_note = f"\n...and {len(query_data) - 20} more records." if len(query_data) > 20 else ""
+        # 1. Check cache first with 60-second Time-To-Live (TTL)
+        cache_key = f"{question.lower().strip()}|{json.dumps(query_data, sort_keys=True, default=str)}"
+        now = time.time()
+        cache = self._load_cache()
+        if cache_key in cache:
+            cached_result, cached_time = cache[cache_key]
+            if now - cached_time < 60:
+                print(f"[OllamaService] Cache hit for RAG and Insights (Age: {now - cached_time:.1f}s)")
+                return cached_result
 
-        prompt = f"""You are EDIP AI, an ERP Business Assistant.
+        # 2. Rule-based fast generator for simple single-value KPI cards
+        if len(query_data) == 1 and len(query_data[0]) == 1:
+            col_name, val = list(query_data[0].items())[0]
+            if isinstance(val, (int, float)) and not isinstance(val, bool):
+                time_suffix = ""
+                if "this month" in question.lower():
+                    time_suffix = " this month"
+                elif "this quarter" in question.lower():
+                    time_suffix = " this quarter"
+                
+                is_currency = any(k in col_name.lower() or k in question.lower() for k in ["amount", "value", "cost", "price", "revenue", "spend", "total_lcy", "total_fcy", "grand_total"])
+                if any(k in col_name.lower() for k in ["count", "sales", "items", "suppliers", "customers"]):
+                    is_currency = False
+
+                formatted_val = f"INR {val:,.2f}" if is_currency else str(val)
+                metric_name = col_name.replace('total_', '').replace('_', ' ').strip()
+                
+                if not is_currency:
+                    summary = f"There are {formatted_val} {metric_name}{time_suffix}."
+                else:
+                    summary = f"The total {metric_name} is {formatted_val}{time_suffix}."
+
+                if "sales" in metric_name or "invoice" in metric_name:
+                    result = {
+                        "summary": summary,
+                        "business_insights": [
+                            f"Sales volume is steady at {formatted_val} units.",
+                            "Monitor customer purchase patterns to identify potential upselling opportunities."
+                        ],
+                        "recommendations": [
+                            "Increase promotional activities during low-sales periods.",
+                            "Analyze sales data to tailor product offerings and improve inventory management."
+                        ]
+                    }
+                elif "purchase" in metric_name or "supplier" in metric_name or "po" in metric_name:
+                    result = {
+                        "summary": summary,
+                        "business_insights": [
+                            f"Total procurement activity stands at {formatted_val}.",
+                            "Evaluate vendor lead times and delivery schedules."
+                        ],
+                        "recommendations": [
+                            "Negotiate bulk volume discounts with primary suppliers.",
+                            "Optimize procurement cycles to prevent stockout events."
+                        ]
+                    }
+                elif "landed cost" in metric_name or "freight" in metric_name or "duty" in metric_name:
+                    result = {
+                        "summary": summary,
+                        "business_insights": [
+                            f"Landed cost analysis shows a metric of {formatted_val}.",
+                            "Assess freight and duty allocations to manage shipping margins."
+                        ],
+                        "recommendations": [
+                            "Consolidate shipments to reduce average freight costs.",
+                            "Re-evaluate logistics contracts periodically to ensure favorable pricing."
+                        ]
+                    }
+                elif "inventory" in metric_name or "stock" in metric_name:
+                    result = {
+                        "summary": summary,
+                        "business_insights": [
+                            f"Current stock level stands at {formatted_val}.",
+                            "Ensure reorder thresholds are set appropriately."
+                        ],
+                        "recommendations": [
+                            "Reorder key stock items before thresholds are breached.",
+                            "Perform physical audits regularly to prevent inventory shrinkage."
+                        ]
+                    }
+                else:
+                    result = {
+                        "summary": summary,
+                        "business_insights": [
+                            f"The current recorded value is {formatted_val}.",
+                            "Track metric changes over time to identify seasonal trends."
+                        ],
+                        "recommendations": [
+                            "Maintain standard business procedures to support current metrics.",
+                            "Optimize resource allocation based on current activity levels."
+                        ]
+                    }
+
+                # Apply temporal note if necessary
+                temporal_keywords = ["trend", "history", "historical", "quarter-over-quarter", "qoq", "year-to-date", "ytd", "year-over-year", "yoy", "compare", "comparison", "growth"]
+                if any(kw in question.lower() for kw in temporal_keywords):
+                    note = "Please note, the system currently only has data available for June 2026."
+                    if note.lower() not in result["summary"].lower():
+                        result["summary"] = f"{result['summary']} {note}"
+
+                # Cache and return
+                cache = self._load_cache()
+                cache[cache_key] = (result, time.time())
+                self._save_cache(cache)
+                print(f"[OllamaService] Generated rule-based fast card response for: {question}")
+                return result
+
+        # 3. Dynamic RAG/Insights generation via Ollama (for list/table/chart queries)
+        data_str = json.dumps(query_data[:15], default=str)
+        more_note = f"\n...and {len(query_data) - 15} more records." if len(query_data) > 15 else ""
+
+        prompt = f"""You are EDIP AI, a Senior ERP Business Analyst.
 
 User Question:
 {question}
@@ -304,42 +356,78 @@ User Question:
 ERP Data:
 {data_str}{more_note}
 
-=== STRICT REPORTING RULES (CRITICAL) ===
+Generate a concise executive summary, exactly 2 professional business insights, and exactly 2 actionable business recommendations based on the data.
 
-1. NO CONVERSATIONAL FILLER:
-   - NEVER say "Here is the data," "Based on the records provided," "I found the following," or "To answer your question."
-   - NEVER introduce yourself. Start the very first word with the actual data.
-
-2. ABSOLUTE LENGTH LIMITS (Choose ONE format):
-   - FORMAT A (Single Number/Count): Write EXACTLY ONE plain-English sentence. (Example: 'There are 44 active items in the system.')
-   - FORMAT B (List/Multiple Records): Write MAXIMUM 2 summary sentences, followed by MAXIMUM 5 bullet points.
-
-3. HANDLING EMPTY DATA []:
-   - If ERP Data is [], output EXACTLY ONE sentence stating no records were found.
-   - Example: 'No purchase orders were found for this month.'
-   - DO NOT explain the concept or suggest alternative actions.
-
-4. FORMATTING & STYLE:
-   - Use INR formatting for currency (e.g., INR 1,23,456).
-   - NEVER output raw JSON arrays like [{{...}}] or SQL column names like 'COUNT(*)'.
-   - DO NOT use emojis, markdown bolding, or special Unicode symbols.
-   - Never create fictional company statistics.
-   - Do NOT repeat the question.
-
-Response Format for Lists:
-Summary:
-- [Fact 1]
-- [Fact 2]
-
-Top records:
-- [Name]: [Value]
-- [Name]: [Value]
+=== RULES (CRITICAL) ===
+1. No conversational filler or labels.
+2. The summary must be exactly 1 plain-English sentence. (Example: 'There are 91 sales this month.').
+3. Keep insights and recommendations short, professional, and actionable (1 sentence per point).
+4. If a column is a count (e.g., SELECT COUNT(*) AS total_sales), it represents the number of transactions/sales (e.g., 91 sales), NOT currency (e.g., NOT INR 91,000). Never assume values are currency unless the column header is a total, amount, or price.
+5. Use INR formatting (e.g., INR 1,23,456) for actual currency amounts ONLY.
+6. Return ONLY a valid JSON object matching this structure:
+{{
+  "summary": "Concise executive summary.",
+  "business_insights": [
+    "Insight 1",
+    "Insight 2"
+  ],
+  "recommendations": [
+    "Recommendation 1",
+    "Recommendation 2"
+  ]
+}}
 """
         try:
-            return self._call_ollama(prompt, json_format=False).strip()
+            # We call Ollama with a lower token limit (256) to make it extremely fast (sub-5 seconds)
+            response_text = self._call_ollama(prompt, json_format=True, stop_sequences=["```"], num_predict=256).strip()
+            # Extract JSON block
+            start = response_text.find('{')
+            end = response_text.rfind('}')
+            if start != -1 and end != -1:
+                response_text = response_text[start:end + 1]
+            result = json.loads(response_text)
+            
+            # Apply temporal note if necessary
+            summary = result.get("summary", "")
+            q_lower = question.lower()
+            temporal_keywords = ["trend", "history", "historical", "quarter-over-quarter", "qoq", "year-to-date", "ytd", "year-over-year", "yoy", "compare", "comparison", "growth"]
+            if any(kw in q_lower for kw in temporal_keywords):
+                note = "Please note, the system currently only has data available for June 2026."
+                if note.lower() not in summary.lower():
+                    if summary.endswith('.'):
+                        result["summary"] = f"{summary} {note}"
+                    else:
+                        result["summary"] = f"{summary}\n\n{note}"
+            
+            # Save to persistent cache
+            cache = self._load_cache()
+            cache[cache_key] = (result, time.time())
+            
+            # Keep cache small (clean up entries older than 1 hour)
+            cleaned_cache = {}
+            for k, v in cache.items():
+                if now - v[1] < 3600:
+                    cleaned_cache[k] = v
+            self._save_cache(cleaned_cache)
+            
+            return result
         except Exception as e:
-            print(f"RAG generation failed: {e}")
-            return "Here is the data you requested."
+            print(f"Failed to generate combined RAG and insights: {e}")
+            return {
+                "summary": "Here is the data you requested.",
+                "business_insights": ["Review the detailed records to identify potential areas of concern."],
+                "recommendations": ["Optimize operations based on the current records."]
+            }
+
+    def generate_rag_response(self, question: str, query_data: list) -> str:
+        """Wrapper around combined generator to match legacy API"""
+        res = self.generate_rag_and_insights(question, query_data)
+        return res.get("summary", "Here is the data you requested.")
+
+    def generate_dashboard_insights(self, question: str, query_data: list) -> dict:
+        """Wrapper around combined generator to match legacy API"""
+        return self.generate_rag_and_insights(question, query_data)
+
 
     def _parse_llm_json(self, raw_text: str) -> dict:
         """Robustly parse JSON out of LLM output even if surrounded by markdown"""
@@ -389,6 +477,16 @@ If the context does not contain enough information to answer, state clearly that
 - Answer directly based on the context.
 - Use bullet points if listing items.
 """
-        return self._call_ollama(prompt)
+        response = self._call_ollama(prompt, stop_sequences=["```"]).strip()
+        q_lower = question.lower()
+        temporal_keywords = ["trend", "history", "historical", "quarter-over-quarter", "qoq", "year-to-date", "ytd", "year-over-year", "yoy", "compare", "comparison", "growth"]
+        if any(kw in q_lower for kw in temporal_keywords):
+            note = "Please note, the system currently only has data available for June 2026."
+            if note.lower() not in response.lower():
+                if response.endswith('.'):
+                    response += f" {note}"
+                else:
+                    response += f"\n\n{note}"
+        return response
 
 

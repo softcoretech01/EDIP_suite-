@@ -50,8 +50,8 @@ erp_questions = [
     "what is the average margin percentage for inventory batches?"
 ]
 
-API_URL = "http://localhost:8001/chat/ask"
-AUTH_URL = "http://localhost:8001/auth/login"
+API_URL = "http://localhost:8000/chat/ask"
+AUTH_URL = "http://localhost:8000/auth/login"
 CONNECTION_ID = 2
 ACCESS_TOKEN = None
 

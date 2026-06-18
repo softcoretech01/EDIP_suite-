@@ -230,10 +230,17 @@ function App() {
   useEffect(() => {
     if (user) {
       axios.get(`${API_URL}/erp/connections`).then(res => {
-        setConnections(res.data);
-        if (res.data.length > 0) {
-          setSelectedConnectionId(res.data[res.data.length - 1].id);
+        // --- NEW CODE: Filter out duplicate database connections by name ---
+        const uniqueConnections = Array.from(
+          new Map(res.data.map((item: any) => [item.name, item])).values()
+        ) as any[];
+
+        setConnections(uniqueConnections);
+        
+        if (uniqueConnections.length > 0) {
+          setSelectedConnectionId(uniqueConnections[uniqueConnections.length - 1].id);
         }
+        // -------------------------------------------------------------------
       }).catch(console.error);
 
       fetchHistory();

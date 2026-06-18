@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 def _warmup_ollama():
     """Send a tiny prompt to Ollama so the model is loaded into RAM before the first real query."""
-    model = os.getenv("OLLAMA_MODEL", "llama3.2").strip().strip('"').strip("'")
+    model = os.getenv("OLLAMA_MODEL", "qwen2.5").strip().strip('"').strip("'")
     try:
         requests.post(
             "http://localhost:11434/api/generate",
@@ -25,16 +25,19 @@ def _warmup_ollama():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create database tables at startup if they do not exist (wrapped in try-except for robustness)
-    try:
-        from app.database.database import Base, engine
-        Base.metadata.create_all(bind=engine)
-        print("[startup] Database tables verified/created.")
-    except Exception as e:
-        print(f"[startup] WARNING: Database connection failed. Tables could not be created/verified: {e}")
+    def _init_db():
+        try:
+            from app.database.database import Base, engine
+            Base.metadata.create_all(bind=engine)
+            print("[startup] Database tables verified/created.")
+        except Exception as e:
+            print(f"[startup] WARNING: Database connection failed. Tables could not be created/verified: {e}")
+
+    loop = asyncio.get_event_loop()
+    # Run DB init in a background thread so it doesn't block startup if the DB is slow/down
+    loop.run_in_executor(None, _init_db)
 
     # Warm up Ollama in a background thread so it doesn't block the server from starting
-    loop = asyncio.get_event_loop()
     loop.run_in_executor(None, _warmup_ollama)
     yield
 

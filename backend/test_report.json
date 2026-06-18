@@ -1,235 +1,95 @@
 {
   "total_tested": 10,
-  "successful": 10,
+  "successful": 0,
   "results": [
     [
       "General",
       {
         "question": "What is an ERP system?",
-        "status_code": 200,
-        "elapsed_seconds": 5.48,
-        "response": {
-          "summary": "Definition: An Enterprise Resource Planning (ERP) system is a software application designed to manage various aspects of an organization's operations, including finance, human resources, supply chain management, production planning, customer relationship management, and more. It integrates different business processes into a single platform to streamline operations, improve efficiency, and enhance decision-making.",
-          "data": [],
-          "chart_type": "text",
-          "executive_summary": "Definition: An Enterprise Resource Planning (ERP) system is a software application designed to manage various aspects of an organization's operations, including finance, human resources, supply chain management, production planning, customer relationship management, and more. It integrates different business processes into a single platform to streamline operations, improve efficiency, and enhance decision-making.",
-          "business_insights": [],
-          "recommendations": []
-        }
+        "status_code": 500,
+        "elapsed_seconds": 31.68,
+        "response": "Internal Server Error"
       }
     ],
     [
       "General",
       {
         "question": "What does ERP stand for?",
-        "status_code": 200,
-        "elapsed_seconds": 5.34,
-        "response": {
-          "summary": "ERP stands for Enterprise Resource Planning. It is a software system designed to manage various aspects of an organization's operations, including finance, human resources, production, inventory management, and supply chain. Key points include:",
-          "data": [],
-          "chart_type": "text",
-          "executive_summary": "ERP stands for Enterprise Resource Planning. It is a software system designed to manage various aspects of an organization's operations, including finance, human resources, production, inventory management, and supply chain. Key points include:",
-          "business_insights": [],
-          "recommendations": []
-        }
+        "status_code": 500,
+        "elapsed_seconds": 15.42,
+        "response": "Internal Server Error"
       }
     ],
     [
       "General",
       {
         "question": "What is the difference between ERP and CRM?",
-        "status_code": 200,
-        "elapsed_seconds": 4.99,
-        "response": {
-          "summary": "ERP (Enterprise Resource Planning) and CRM (Customer Relationship Management) are two distinct software solutions used in business operations. Here's a brief comparison:",
-          "data": [],
-          "chart_type": "text",
-          "executive_summary": "ERP (Enterprise Resource Planning) and CRM (Customer Relationship Management) are two distinct software solutions used in business operations. Here's a brief comparison:",
-          "business_insights": [],
-          "recommendations": []
-        }
+        "status_code": 500,
+        "elapsed_seconds": 12.84,
+        "response": "Internal Server Error"
       }
     ],
     [
       "General",
       {
         "question": "What is a Purchase Requisition (PR)?",
-        "status_code": 200,
-        "elapsed_seconds": 5.41,
-        "response": {
-          "summary": "Definition: A Purchase Requisition (PR) is a document used in an enterprise resource planning (ERP) system to request the purchase of goods or services from suppliers. It outlines the details of the items needed, such as quantity, description, unit price, and vendor information.",
-          "data": [],
-          "chart_type": "text",
-          "executive_summary": "Definition: A Purchase Requisition (PR) is a document used in an enterprise resource planning (ERP) system to request the purchase of goods or services from suppliers. It outlines the details of the items needed, such as quantity, description, unit price, and vendor information.",
-          "business_insights": [],
-          "recommendations": []
-        }
+        "status_code": 500,
+        "elapsed_seconds": 13.21,
+        "response": "Internal Server Error"
       }
     ],
     [
       "General",
       {
         "question": "What is a Purchase Order (PO)?",
-        "status_code": 200,
-        "elapsed_seconds": 5.26,
-        "response": {
-          "summary": "Definition: A Purchase Order (PO) is a document used in business to formally request goods or services from a supplier. It outlines the details of the order, including the quantity, description, price, delivery terms, and payment conditions.",
-          "data": [],
-          "chart_type": "text",
-          "executive_summary": "Definition: A Purchase Order (PO) is a document used in business to formally request goods or services from a supplier. It outlines the details of the order, including the quantity, description, price, delivery terms, and payment conditions.",
-          "business_insights": [],
-          "recommendations": []
-        }
+        "status_code": 500,
+        "elapsed_seconds": 12.16,
+        "response": "Internal Server Error"
       }
     ],
     [
       "Company Data",
       {
         "question": "how many sales orders are in the system?",
-        "status_code": 200,
-        "elapsed_seconds": 5.01,
-        "response": {
-          "sql": "SELECT COUNT(*) AS total_count FROM Sales_Masters.SalesOrder_Header AS T1",
-          "chart_type": "card",
-          "summary": "There are 91 sales orders in the system.",
-          "data": [
-            {
-              "total_count": 91
-            }
-          ],
-          "executive_summary": "There are 91 sales orders in the system.",
-          "business_insights": [],
-          "recommendations": []
-        }
+        "status_code": 500,
+        "elapsed_seconds": 12.15,
+        "response": "Internal Server Error"
       }
     ],
     [
       "Company Data",
       {
         "question": "show all customers",
-        "status_code": 200,
-        "elapsed_seconds": 4.65,
-        "response": {
-          "sql": "SELECT id, name FROM masters.customers ORDER BY name LIMIT 50",
-          "chart_type": "table",
-          "summary": "There are 4 customers in the system.",
-          "data": [
-            {
-              "id": "TN-1",
-              "name": "ACE FIRE ENGINEERING PTE LTD"
-            },
-            {
-              "id": "TN-2",
-              "name": "AIR LIQUIDE SINGAPORE PTE LTD"
-            },
-            {
-              "id": "TN-3",
-              "name": "AKHUN SERVICE"
-            },
-            {
-              "id": "TN001",
-              "name": "test"
-            }
-          ],
-          "executive_summary": "There are 4 customers in the system.",
-          "business_insights": [],
-          "recommendations": []
-        }
+        "status_code": 500,
+        "elapsed_seconds": 12.21,
+        "response": "Internal Server Error"
       }
     ],
     [
       "Company Data",
       {
         "question": "show all suppliers",
-        "status_code": 200,
-        "elapsed_seconds": 5.08,
-        "response": {
-          "sql": "SELECT id, name FROM masters.suppliers ORDER BY name LIMIT 50",
-          "chart_type": "table",
-          "summary": "There are 2 suppliers in the system.  \n- Global Steel Industries: \n- Nippon Machinery Corp",
-          "data": [
-            {
-              "id": "SUPP-1",
-              "name": "Global Steel Industries"
-            },
-            {
-              "id": "SUPP-2",
-              "name": "Nippon Machinery Corp"
-            }
-          ],
-          "executive_summary": "There are 2 suppliers in the system.  \n- Global Steel Industries: \n- Nippon Machinery Corp",
-          "business_insights": [],
-          "recommendations": []
-        }
+        "status_code": 500,
+        "elapsed_seconds": 14.72,
+        "response": "Internal Server Error"
       }
     ],
     [
       "Company Data",
       {
         "question": "how many items are active in the system?",
-        "status_code": 200,
-        "elapsed_seconds": 4.84,
-        "response": {
-          "sql": "SELECT COUNT(*) AS total_items FROM masters.items",
-          "chart_type": "card",
-          "summary": "There are 11 active items in the system.",
-          "data": [
-            {
-              "total_items": 11
-            }
-          ],
-          "executive_summary": "There are 11 active items in the system.",
-          "business_insights": [],
-          "recommendations": []
-        }
+        "status_code": 500,
+        "elapsed_seconds": 12.17,
+        "response": "Internal Server Error"
       }
     ],
     [
       "Company Data",
       {
         "question": "what is the highest value invoice?",
-        "status_code": 200,
-        "elapsed_seconds": 5.01,
-        "response": {
-          "sql": "SELECT invoice_id, customer_name, total, created_at FROM Sales_Masters.Invoice_Header WHERE MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE()) ORDER BY total DESC LIMIT 5",
-          "chart_type": "table",
-          "summary": "Highest value invoice: INR 32,370.35",
-          "data": [
-            {
-              "invoice_id": "INV-202604-109",
-              "customer_name": "Alpha Corp",
-              "total": 32370.35,
-              "created_at": "2026-06-10 10:46:30"
-            },
-            {
-              "invoice_id": "INV-202604-129",
-              "customer_name": "Beta LLC",
-              "total": 29795,
-              "created_at": "2026-06-10 10:46:33"
-            },
-            {
-              "invoice_id": "INV-202605-178",
-              "customer_name": "Gamma Logistics",
-              "total": 26927.6,
-              "created_at": "2026-06-10 10:46:42"
-            },
-            {
-              "invoice_id": "INV-202604-102",
-              "customer_name": "Beta LLC",
-              "total": 24862.6,
-              "created_at": "2026-06-10 10:46:27"
-            },
-            {
-              "invoice_id": "INV-202604-113",
-              "customer_name": "Beta LLC",
-              "total": 24201.8,
-              "created_at": "2026-06-10 10:46:30"
-            }
-          ],
-          "executive_summary": "Highest value invoice: INR 32,370.35",
-          "business_insights": [],
-          "recommendations": []
-        }
+        "status_code": 500,
+        "elapsed_seconds": 12.13,
+        "response": "Internal Server Error"
       }
     ]
   ]
